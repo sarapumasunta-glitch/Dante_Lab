@@ -1,0 +1,617 @@
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<title>DANTE LAB</title>
+<meta name="description" content="Explora, descubre e imagina el mundo. Un juego de aventuras para exploradores.">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#2a8fd0">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DANTE LAB">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap');
+:root{
+ --ink:#26324a;          /* texto principal (no negro puro: mejor para dislexia) */
+ --sky1:#8ed6f5; --sky2:#a8e6c8; --sky3:#d6f0b0;
+ --card:#ffffff; --cardEdge:#ffffff;
+ --amber:#ff9d2a; --amberDeep:#d0681a;
+ --pink:#ff6f9c; --pinkDeep:#c93d6e;
+ --oc:#2a8fd0; --ocDeep:#1a6fa8;
+ --an:#3aa85a; --anDeep:#2a8040;
+ --es:#7a4ac8; --esDeep:#5a2aa0;
+ --lu:#e0762a; --luDeep:#b0561a;
+ --sun:#ffd23f; --sunEdge:#e0aa10;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Nunito',system-ui,sans-serif;color:var(--ink);background:#a8e6c8;-webkit-text-size-adjust:100%;overflow-x:hidden}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+img{max-width:100%}
+
+.app{max-width:460px;margin:0 auto;min-height:100vh;min-height:100dvh;position:relative;overflow:hidden;
+ background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky3) 100%)}
+.clouds{position:absolute;inset:0;pointer-events:none;opacity:.85;z-index:0}
+.cloud{position:absolute;background:#fff;border-radius:60px;opacity:.6;filter:blur(.3px)}
+.view{position:relative;z-index:2;padding:14px 16px calc(24px + env(safe-area-inset-bottom));display:none;animation:fade .35s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.7);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+
+/* ---------- HUD ---------- */
+.hud{display:flex;align-items:center;gap:10px;margin-bottom:10px;background:#ffffffe8;border:3px solid #fff;border-radius:22px;padding:8px 12px;box-shadow:0 5px 0 #cfae7f, 0 8px 16px #0002;margin-top:env(safe-area-inset-top)}
+.chip{width:50px;height:50px;border-radius:15px;background:linear-gradient(160deg,#ffe08a,#ffb04a);display:grid;place-items:center;box-shadow:0 4px 0 var(--sunEdge);flex-shrink:0}
+.chip svg{width:38px;height:38px}
+.hudInfo{flex:1;min-width:0}
+.hudName{font-family:'Baloo 2';font-weight:800;font-size:16px;color:var(--ink);display:flex;align-items:center;gap:6px;line-height:1}
+.lvlPill{background:var(--pink);color:#fff;font-size:11px;font-weight:900;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.xpbar{height:12px;background:#eadfce;border-radius:99px;margin-top:6px;overflow:hidden;border:2px solid #fff}
+.xpfill{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--amber));border-radius:99px;transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+.gems{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.gem{background:#fff;border:2px solid #ffd88a;border-radius:99px;padding:2px 9px;font-size:13px;font-weight:900;color:#7a5a2a;display:flex;gap:4px;align-items:center;white-space:nowrap}
+
+/* ---------- mascota ---------- */
+.stage{position:relative;height:196px;display:grid;place-items:center;margin-top:2px}
+.glow{position:absolute;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,#ffffff99,transparent 62%);animation:pulse 3.4s infinite}
+@keyframes pulse{0%,100%{transform:scale(.92);opacity:.6}50%{transform:scale(1.08);opacity:1}}
+.mascot{position:relative;animation:bob 2.6s infinite ease-in-out;cursor:pointer}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-13px) rotate(1.5deg)}}
+.mascot.jump{animation:jump .6s ease}
+@keyframes jump{0%,100%{transform:translateY(0)}40%{transform:translateY(-40px) rotate(8deg)}}
+.mascot svg{width:158px;height:158px;filter:drop-shadow(0 12px 14px #4a904055)}
+.speechWrap{text-align:center;margin-top:2px;min-height:56px}
+.speech{background:#fff;color:#33405c;font-family:'Baloo 2';font-weight:700;font-size:15px;padding:11px 17px;border-radius:20px;display:inline-block;position:relative;box-shadow:0 5px 0 #d9e2ec;max-width:310px;line-height:1.3}
+.speech::after{content:"";position:absolute;top:-9px;left:50%;transform:translateX(-50%);border:9px solid transparent;border-bottom-color:#fff;border-top:0}
+
+/* ---------- botón grande accesible (min 48px, mucho aire) ---------- */
+.bigBtn{width:100%;background:var(--sun);color:#6a3a00;font-family:'Baloo 2';font-weight:800;font-size:19px;padding:16px;border-radius:18px;box-shadow:0 6px 0 var(--sunEdge);min-height:56px;transition:transform .1s,box-shadow .1s}
+.bigBtn:active{transform:translateY(5px);box-shadow:0 1px 0 var(--sunEdge)}
+
+/* ---------- tarjeta reto del día ---------- */
+.daily{margin-top:12px;background:linear-gradient(150deg,var(--amber),#ff7a5a);border:4px solid #fff;border-radius:26px;padding:17px;position:relative;overflow:hidden;box-shadow:0 8px 0 var(--amberDeep),0 12px 22px #0002}
+.daily .tag{font-size:11px;font-weight:900;letter-spacing:.06em;background:#ffffff33;color:#fff;display:inline-block;padding:3px 11px;border-radius:99px}
+.daily h2{font-family:'Baloo 2';font-weight:800;font-size:21px;color:#fff;margin:8px 0 2px;text-shadow:0 2px 0 #b0501a55;line-height:1.1}
+.daily p{font-size:14px;color:#fff;font-weight:800;opacity:.97;line-height:1.35}
+.daily .go{margin-top:13px;background:#fff;color:var(--amberDeep);box-shadow:0 5px 0 #e8c9a0}
+.daily .go:active{box-shadow:0 1px 0 #e8c9a0}
+
+/* ---------- secciones ---------- */
+.secTitle{font-family:'Baloo 2';font-weight:800;font-size:18px;color:#2f5a3a;margin:22px 4px 12px;display:flex;align-items:center;gap:8px}
+.secTitle .cnt{margin-left:auto;font-size:13px;color:var(--amberDeep);background:#fff;padding:2px 11px;border-radius:99px;font-weight:900}
+
+/* ---------- mundos ---------- */
+.worlds{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.world{border-radius:24px;padding:15px;min-height:132px;position:relative;overflow:hidden;text-align:left;color:#fff;border:4px solid #fff;box-shadow:0 7px 0 rgba(0,0,0,.18);transition:transform .12s}
+.world:active{transform:scale(.96)}
+.world .we{font-size:42px;filter:drop-shadow(0 3px 4px #0004);line-height:1}
+.world .we svg{width:46px;height:46px}
+.world .wn{font-family:'Baloo 2';font-weight:800;font-size:17px;margin-top:6px}
+.world .wm{font-size:12px;font-weight:800;opacity:.96;margin-top:1px;display:flex;align-items:center;gap:4px}
+.world.locked{filter:saturate(.35) brightness(.85)}
+.world.locked .lockTag{position:absolute;top:10px;right:12px;font-size:18px}
+.dots{display:flex;gap:3px;margin-top:8px}
+.dots i{width:15px;height:6px;border-radius:99px;background:#ffffff55}
+.dots i.on{background:#fff}
+
+/* ---------- colección ---------- */
+.collect{display:flex;gap:10px;margin-top:4px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}
+.card{flex-shrink:0;width:74px;height:98px;border-radius:16px;background:#ffffff70;border:3px dashed #ffffffcc;display:grid;place-items:center;font-size:30px;scroll-snap-align:start;color:#7a8a6a}
+.card.got{border:3px solid #fff;background:linear-gradient(160deg,#fff6e2,#ffe2b2);box-shadow:0 5px 0 #e8c9a0aa;cursor:pointer}
+
+/* ============ MUNDO (detalle) ============ */
+.back{background:#ffffffcc;border:3px solid #fff;color:var(--ink);font-family:'Baloo 2';font-weight:800;font-size:15px;padding:9px 16px;border-radius:99px;box-shadow:0 4px 0 #cfae7f;display:inline-flex;align-items:center;gap:6px;min-height:44px}
+.worldHead{border-radius:26px;padding:22px;color:#fff;margin:6px 0 16px;position:relative;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 0 rgba(0,0,0,.2)}
+.worldHead .big{font-size:64px;line-height:1;filter:drop-shadow(0 4px 6px #0005)}
+.worldHead .big svg{width:68px;height:68px}
+.worldHead h1{font-family:'Baloo 2';font-weight:800;font-size:28px;margin-top:4px}
+.worldHead p{font-weight:800;opacity:.95;margin-top:2px;font-size:14px;line-height:1.35}
+.spots{display:grid;gap:12px}
+.spot{background:#fff;border:4px solid #fff;border-radius:22px;padding:14px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 0 #d8cbb4;text-align:left;transition:transform .12s}
+.spot.nuevo{border-color:#ffd23f;box-shadow:0 6px 0 #d9a72a;animation:spotGlow 2s infinite}
+@keyframes spotGlow{0%,100%{box-shadow:0 6px 0 #d9a72a}50%{box-shadow:0 6px 0 #d9a72a,0 0 16px #ffd23f88}}
+.spot.done{opacity:.82}
+.spot:active{transform:scale(.98)}
+.spot .se{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-size:32px;flex-shrink:0;color:#fff}
+.spot .st{flex:1;min-width:0}
+.spot .st b{font-family:'Baloo 2';font-weight:800;font-size:16px;display:block;color:var(--ink);line-height:1.15}
+.spot .st span{font-size:12px;font-weight:800;color:#8a93a6}
+.spot .chev{font-size:22px;color:#c3ccd8}
+.spot.done{opacity:.75}
+.spot.done .se::after{content:"✓";position:absolute;font-size:16px;background:var(--an);color:#fff;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;transform:translate(20px,-20px);border:2px solid #fff}
+.spot .se{position:relative}
+
+/* ============ DESCUBRIMIENTO ============ */
+.discHead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.photo{width:100%;aspect-ratio:4/3;border-radius:24px;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 0 rgba(0,0,0,.15);background:#1a2a4a;position:relative}
+.realBadge{position:absolute;bottom:10px;right:10px;background:#00000088;color:#fff;font-size:11px;font-weight:800;padding:4px 10px;border-radius:99px;backdrop-filter:blur(4px)}
+.discTitle{font-family:'Baloo 2';font-weight:800;font-size:24px;margin:16px 4px 6px;line-height:1.1;color:var(--ink)}
+.factBox{background:#fff;border:4px solid #fff;border-radius:22px;padding:16px;box-shadow:0 6px 0 #d8cbb4;display:flex;gap:12px;align-items:flex-start}
+.factBox .fb{width:44px;height:44px;flex-shrink:0}
+.factBox p{font-size:15.5px;font-weight:800;line-height:1.45;color:#3a4560}
+.discBtn{margin-top:16px}
+
+/* ============ RETO (mini-juego) ============ */
+.quizQ{font-family:'Baloo 2';font-weight:800;font-size:22px;text-align:center;margin:10px 8px 18px;color:var(--ink);line-height:1.2}
+.opts{display:grid;gap:12px}
+.opt{background:#fff;border:4px solid #fff;border-radius:20px;padding:16px 18px;font-family:'Baloo 2';font-weight:700;font-size:17px;text-align:left;box-shadow:0 6px 0 #d8cbb4;min-height:56px;display:flex;align-items:center;gap:12px;transition:transform .1s}
+.opt:active{transform:scale(.98)}
+.opt .letter{width:32px;height:32px;border-radius:10px;background:#eef3f8;display:grid;place-items:center;font-weight:900;color:#7a8aa0;flex-shrink:0}
+.opt.right{background:#e7f8ec;border-color:var(--an);box-shadow:0 6px 0 var(--anDeep)}
+.opt.right .letter{background:var(--an);color:#fff}
+.opt.wrong{background:#fff6d6;border-color:#ffd23f;box-shadow:0 6px 0 #d9a72a}
+.opt.wrong .letter{background:#ffd23f;color:#7a5a10}
+
+/* ============ RECOMPENSA ============ */
+.reward{text-align:center;padding-top:20px}
+.rewardCard{width:190px;height:250px;margin:16px auto;border-radius:24px;background:linear-gradient(160deg,#fff6e2,#ffdca0);border:5px solid #fff;box-shadow:0 12px 0 #e0b060,0 16px 30px #0003;display:grid;place-items:center;animation:pop .6s ease}
+.rewardCard .rc-emoji{font-size:90px}
+.rewardCard .rc-name{font-family:'Baloo 2';font-weight:800;font-size:15px;color:#7a5a2a;padding:0 12px;margin-top:6px}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:30;overflow:hidden}
+.conf{position:absolute;width:10px;height:14px;top:-20px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+.rewardTitle{font-family:'Baloo 2';font-weight:800;font-size:26px;color:var(--ink)}
+.xpGain{display:inline-block;background:var(--sun);color:#6a3a00;font-family:'Baloo 2';font-weight:800;font-size:18px;padding:6px 18px;border-radius:99px;margin:8px 0;box-shadow:0 4px 0 var(--sunEdge)}
+
+/* ============ GATE (bienvenida) ============ */
+#gate{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+ padding:calc(env(safe-area-inset-top) + 20px) 22px calc(env(safe-area-inset-bottom) + 20px);
+ overflow-y:auto;-webkit-overflow-scrolling:touch;
+ background:linear-gradient(180deg,#8ed6f5,#a8e6c8 60%,#d6f0b0)}
+#gate.hide{opacity:0;pointer-events:none;transition:.5s}
+#gate .gc{max-width:360px;width:100%;margin:auto;animation:fade .6s ease}
+#gate .badge{background:#fff;color:var(--amberDeep);font-weight:900;font-size:12px;letter-spacing:.06em;padding:6px 14px;border-radius:99px;box-shadow:0 4px 0 #e8c9a0;display:inline-block}
+#gate .gm{margin:14px auto}
+#gate .gm svg{width:130px;height:130px;filter:drop-shadow(0 12px 16px #4a904055);animation:bob 2.6s infinite ease-in-out}
+#gate h1{font-family:'Baloo 2';font-weight:800;font-size:28px;color:var(--ink);margin:6px 0}
+#gate p{font-weight:800;color:#3a5a4a;line-height:1.4;margin-bottom:4px}
+#gate .enter{margin-top:16px}
+/* pantallas cortas (iPhone X y similares): compactar para que TODO quepa y el botón se vea */
+@media(max-height:740px){
+ #gate .gm{margin:8px auto}
+ #gate .gm svg{width:104px;height:104px}
+ #gate h1{font-size:24px;margin:4px 0}
+ #gate p{font-size:14px;margin-bottom:2px}
+ #gate .badge{font-size:11px;padding:5px 12px}
+ #gate .enter{margin-top:12px}
+}
+
+/* nombre */
+.nameCard{background:#fff;border:4px solid #fff;border-radius:26px;padding:24px;box-shadow:0 8px 0 #d8cbb4;text-align:center;margin-top:8px}
+.nameCard input{width:100%;font-family:'Baloo 2';font-weight:700;font-size:22px;text-align:center;padding:15px;border:3px solid #e2e8f0;border-radius:16px;color:var(--ink)}
+.nameCard input:focus{outline:none;border-color:var(--oc)}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#26324a;color:#fff;padding:12px 18px;border-radius:14px;font-weight:800;opacity:0;transition:.25s;z-index:50;max-width:90%;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* botón accesibilidad (juego, no símbolo médico) */
+.access{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));background:#26324a;color:#fff;padding:10px 14px;border-radius:99px;z-index:20;font-weight:800;font-size:13px;box-shadow:0 4px 10px #0003}
+.sndBtn{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));background:#26324a;color:#fff;width:48px;height:48px;border-radius:50%;z-index:20;font-size:20px;box-shadow:0 4px 10px #0003}
+.sndBtn:active{transform:scale(.92)}
+
+.center{display:flex;justify-content:center}
+.mt16{margin-top:16px}
+
+/* ===== mini-juego Atrapa el tesoro ===== */
+#v-catch{padding-bottom:0}
+.catchHud{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.catchScore,.catchTime{background:#fff;border:3px solid #fff;border-radius:99px;padding:5px 12px;font-weight:900;font-size:15px;color:var(--ink);box-shadow:0 4px 0 #cfae7f}
+.catchTime{color:var(--amberDeep)}
+.catchBarWrap{height:16px;background:#ffffffcc;border-radius:99px;overflow:hidden;border:3px solid #fff;box-shadow:0 3px 0 #cfae7f;margin-bottom:10px}
+.catchBar{height:100%;width:0%;background:linear-gradient(90deg,#ff9d2a,#ff6f9c);border-radius:99px;transition:width .2s}
+.catchArea{position:relative;width:100%;height:62vh;max-height:520px;border-radius:24px;overflow:hidden;
+ background:linear-gradient(180deg,#bfeaff,#dff5c8);border:4px solid #fff;box-shadow:0 8px 0 #cfae7f, inset 0 0 40px #ffffff55}
+.falling{position:absolute;font-size:44px;top:-60px;cursor:pointer;user-select:none;will-change:transform;
+ filter:drop-shadow(0 3px 4px #0003);transition:transform .08s}
+.falling:active{transform:scale(1.3)}
+.falling.pop{animation:popOut .3s forwards}
+@keyframes popOut{to{transform:scale(1.8);opacity:0}}
+.catchHint{text-align:center;font-family:'Baloo 2';font-weight:800;color:#3a5a4a;margin-top:10px;font-size:15px}
+.catchFlash{position:absolute;inset:0;pointer-events:none;border-radius:24px;box-shadow:inset 0 0 0 0 #ffd23f00}
+
+/* ===== laberinto ===== */
+.mazeWrap{width:100%;display:flex;justify-content:center;margin-top:4px}
+#mazeCanvas{width:100%;max-width:360px;aspect-ratio:1/1;border-radius:24px;border:4px solid #fff;box-shadow:0 8px 0 #cfae7f;background:#eaf6ff;touch-action:none}
+.mazeHint{text-align:center;font-family:'Baloo 2';font-weight:800;color:#3a5a4a;margin:10px 0;font-size:15px}
+.dpad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(3,64px);gap:8px;justify-content:center;margin-top:4px}
+.dbtn{width:64px;height:64px;border-radius:18px;background:#fff;border:3px solid #fff;box-shadow:0 5px 0 #cfae7f;font-size:26px;display:grid;place-items:center}
+.dbtn:active{transform:translateY(4px);box-shadow:0 1px 0 #cfae7f}
+.dcenter{background:#fff3d6;box-shadow:0 5px 0 #e0c080;pointer-events:none}
+/* ===== Carreras ===== */
+.raceArea{position:relative;width:100%;height:56vh;max-height:460px;border-radius:24px;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 0 #cfae7f}
+.raceTrack{position:absolute;inset:0}
+.raceLine{position:absolute;top:0;bottom:0;width:4px;background:repeating-linear-gradient(#ffffffcc 0 18px,transparent 18px 36px);transform:translateX(-2px)}
+.racer{position:absolute;bottom:12px;font-size:46px;transform:translateX(-50%);transition:left .12s;filter:drop-shadow(0 3px 4px #0005);z-index:2}
+.racer.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(-50%)}25%{transform:translateX(-58%) rotate(-8deg)}75%{transform:translateX(-42%) rotate(8deg)}}
+.raceItem{position:absolute;font-size:38px;transform:translateX(-50%);filter:drop-shadow(0 2px 3px #0004);will-change:top}
+.raceItem.pop{animation:popOut .25s forwards}
+.raceItem.bump{animation:bumpOut .3s forwards}
+@keyframes bumpOut{to{transform:translateX(-50%) scale(1.5) rotate(20deg);opacity:0}}
+.raceCtrls{display:flex;gap:14px;justify-content:center;margin-top:10px}
+.raceBtn{width:76px;height:60px;border-radius:18px;background:#fff;border:3px solid #fff;box-shadow:0 5px 0 #cfae7f;font-size:30px}
+.raceBtn:active{transform:translateY(4px);box-shadow:0 1px 0 #cfae7f}
+
+/* ===== Párame la mano ===== */
+.pmTimeWrap{height:12px;background:#ffffffcc;border-radius:99px;overflow:hidden;border:3px solid #fff;box-shadow:0 3px 0 #cfae7f;margin-bottom:8px}
+.pmTimeBar{height:100%;width:100%;background:linear-gradient(90deg,#ff9d2a,#ff6f9c);border-radius:99px;transition:width 1s linear}
+.pmProgress{text-align:center;font-weight:800;color:#3a5a4a;font-size:13px;margin-bottom:8px}
+.pmLetterBox{text-align:center;font-family:'Baloo 2';font-weight:800;color:var(--ink);font-size:20px;margin-bottom:6px}
+.pmLetter{display:inline-grid;place-items:center;width:52px;height:52px;background:linear-gradient(150deg,#ff9d2a,#ff6f9c);color:#fff;border-radius:16px;font-size:30px;vertical-align:middle;margin-left:6px;box-shadow:0 5px 0 #cf6a3a}
+.pmQ{text-align:center;font-family:'Baloo 2';font-weight:800;font-size:19px;color:var(--ink);margin:10px 0 14px}
+.pmOpts{display:flex;flex-direction:column;gap:12px}
+.pmOpt{padding:18px;border-radius:18px;background:#fff;border:3px solid #fff;box-shadow:0 5px 0 #cfae7f;font-family:'Baloo 2';font-weight:700;font-size:19px;color:var(--ink);text-align:left}
+.pmOpt:active{transform:translateY(3px);box-shadow:0 2px 0 #cfae7f}
+.pmOpt.right{background:#d6f5c8;border-color:#7ac86a;box-shadow:0 5px 0 #5aa84a}
+.pmOpt.wrong{background:#fff6d6;border-color:#ffd23f;box-shadow:0 5px 0 #d9a72a}
+.pmOpt:disabled{opacity:1}
+
+/* ===== Puntería láser ===== */
+.laserArea{position:relative;width:100%;height:56vh;max-height:460px;border-radius:24px;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 0 #cfae7f}
+.laserTarget{position:absolute;width:64px;height:64px;display:grid;place-items:center;cursor:pointer;animation:appear .18s ease}
+@keyframes appear{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+.laserTarget .ring{position:absolute;inset:0;border-radius:50%;border:4px solid #ffffffcc;box-shadow:0 0 14px #ffffff88, inset 0 0 10px #ffffff55;animation:pulseRing 1s infinite}
+@keyframes pulseRing{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.12);opacity:.5}}
+.laserTarget .em{font-size:34px;z-index:2;filter:drop-shadow(0 2px 3px #0006)}
+.laserTarget.bad .ring{border-color:#ff5a5a;box-shadow:0 0 14px #ff5a5a}
+.laserTarget.hit{animation:hitFx .22s forwards}
+@keyframes hitFx{to{transform:scale(1.7);opacity:0;filter:brightness(2)}}
+.laserTarget.boom{animation:boomFx .3s forwards}
+@keyframes boomFx{to{transform:scale(.4) rotate(20deg);opacity:0}}
+.laserTarget.fade{animation:fadeOut .2s forwards}
+@keyframes fadeOut{to{opacity:0;transform:scale(.7)}}
+/* ===== elegir superpoder ===== */
+.powerGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.powerCard{background:#fff;border:3px solid #fff;border-radius:18px;padding:14px 8px;box-shadow:0 5px 0 #cfae7f;text-align:center}
+.powerCard:active{transform:translateY(3px);box-shadow:0 2px 0 #cfae7f}
+.powerCard.sel{border-color:#7ac86a;background:#eafce0;box-shadow:0 5px 0 #5aa84a}
+.powerCard .pe{font-size:36px}
+.powerCard .pn{font-family:'Baloo 2';font-weight:800;font-size:16px;color:var(--ink);margin-top:4px}
+.powerCard .pd{font-size:12px;color:#6a7a6a;margin-top:2px}
+/* ===== Rayuela sensorial ===== */
+.rayField{width:100%;max-width:360px;margin:6px auto 0;background:linear-gradient(180deg,#eaf6ff,#dff5c8);border:4px solid #fff;border-radius:24px;box-shadow:0 8px 0 #cfae7f;padding:14px}
+.rayCasillas{display:flex;flex-direction:column-reverse;gap:10px}
+.rayCell{width:88px;min-height:56px;border-radius:16px;background:#fff;border:3px solid #fff;box-shadow:0 5px 0 #cfae7f;display:grid;place-items:center;position:relative}
+.rayCell .rn{font-family:'Baloo 2';font-weight:800;font-size:20px;color:#9aa6bd}
+.rayCell.target{background:#fff6cc;border-color:#ffd23f;box-shadow:0 5px 0 #d9a72a;animation:rayPulse 1s infinite}
+@keyframes rayPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.rayCell.target::after{content:'⭐';position:absolute;font-size:26px}
+.rayCell.flash{background:#cfeaff;border-color:#3ac0e0;box-shadow:0 5px 0 #2a90b0;transform:scale(1.08)}
+.rayCell.ok{background:#d6f5c8;border-color:#7ac86a;box-shadow:0 5px 0 #5aa84a}
+.rayCell.nope{background:#fff6d6;border-color:#ffd23f}
+@keyframes rayShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ===== Constructor de bloques ===== */
+.buildPalette{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:10px}
+.swatch{width:36px;height:36px;border-radius:10px;border:3px solid #fff;box-shadow:0 3px 0 #cfae7f}
+.swatch.sel{outline:3px solid var(--ink);outline-offset:1px}
+.swatch.eraser{background:#fff;display:grid;place-items:center;font-size:18px}
+.buildGrid{display:grid;gap:2px;width:100%;max-width:360px;margin:0 auto;aspect-ratio:12/14;background:#cdd6e8;border:4px solid #fff;border-radius:16px;box-shadow:0 8px 0 #cfae7f;padding:4px;touch-action:none}
+.bcell{background:#f4f7fc;border-radius:3px}
+.buildBtns{display:flex;gap:10px;justify-content:center;margin-top:12px}
+.buildAct{padding:12px 20px;border-radius:14px;background:#fff;border:3px solid #fff;box-shadow:0 5px 0 #cfae7f;font-family:'Baloo 2';font-weight:700;font-size:16px;color:var(--ink)}
+.buildAct:active{transform:translateY(3px);box-shadow:0 2px 0 #cfae7f}
+.buildAct.done{background:#d6f5c8;border-color:#7ac86a;box-shadow:0 5px 0 #5aa84a}
+/* ===== tarjeta taller de bloques (home) ===== */
+.creatorCard{width:100%;display:flex;align-items:center;gap:12px;margin-top:12px;padding:14px 16px;border-radius:22px;background:linear-gradient(150deg,#8a5ce0,#6a3ac0);border:0;box-shadow:0 6px 0 #4a1a90;text-align:left}
+.creatorCard:active{transform:translateY(3px);box-shadow:0 3px 0 #4a1a90}
+.creatorCard .ccIcon{font-size:38px;filter:drop-shadow(0 2px 3px #0004)}
+.creatorCard .ccText{flex:1;color:#fff}
+.creatorCard .ccTitle{font-family:'Baloo 2';font-weight:800;font-size:18px}
+.creatorCard .ccDesc{font-size:13px;opacity:.92;font-weight:700}
+.creatorCard .ccArrow{color:#fff;font-size:20px;opacity:.9}
+/* ===== Arcade ===== */
+.arcadeIntro{text-align:center;font-family:'Baloo 2';font-weight:800;font-size:19px;color:var(--ink);margin:8px 0 16px}
+.arcadeGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.arcadeCard{background:#fff;border:3px solid #fff;border-radius:22px;padding:16px 12px;box-shadow:0 6px 0 #cfae7f;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
+.arcadeCard:active{transform:translateY(4px);box-shadow:0 2px 0 #cfae7f}
+.arcadeCard .acIcon{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;margin-bottom:4px}
+.arcadeCard .acIcon svg{width:44px;height:44px}
+.arcadeCard .acName{font-family:'Baloo 2';font-weight:800;font-size:16px;color:var(--ink)}
+.arcadeCard .acDesc{font-size:12px;color:#7a8496;font-weight:700;line-height:1.2}
+.arcadeCard .acLvl{margin-top:4px;font-size:11px;font-weight:900;color:#e0762a;background:#fff3d6;padding:2px 8px;border-radius:99px}
+/* ===== ¿te gustó? ===== */
+.opinionBox{max-width:360px;margin:20px auto 0;background:#fff;border:4px solid #fff;border-radius:26px;box-shadow:0 8px 0 #cfae7f;padding:24px 18px;text-align:center}
+.opMascot svg{width:88px;height:88px}
+.opTitle{font-family:'Baloo 2';font-weight:800;font-size:22px;color:var(--ink);margin-top:6px}
+.opSub{font-weight:800;color:#7a8496;font-size:14px;margin:4px 0 16px}
+.opFaces{display:flex;justify-content:center;gap:10px}
+.opFace{width:62px;height:62px;border-radius:18px;background:#f4f7fc;border:3px solid #eef1f6;font-size:34px;box-shadow:0 4px 0 #d8dee8}
+.opFace:active{transform:translateY(3px);box-shadow:0 1px 0 #d8dee8}
+.opFace.sel{background:#fff6cc;border-color:#ffd23f;box-shadow:0 4px 0 #d9a72a}
+.opThanks{font-family:'Baloo 2';font-weight:800;color:#3aa85a;font-size:17px;min-height:24px;margin-top:14px}
+/* ===== Taller: menú de modos ===== */
+.buildMenu{display:flex;flex-direction:column;gap:14px;max-width:340px;margin:10px auto}
+.buildModeCard{border:0;border-radius:22px;padding:20px;text-align:left;display:flex;flex-direction:column;gap:2px;color:#fff}
+.buildModeCard:active{transform:translateY(3px)}
+.buildModeCard.c1{background:linear-gradient(150deg,#ff9d3f,#e0632a);box-shadow:0 6px 0 #b0431a}
+.buildModeCard.c2{background:linear-gradient(150deg,#8a5ce0,#6a3ac0);box-shadow:0 6px 0 #4a1a90}
+.buildModeCard .bmIcon{font-size:40px}
+.buildModeCard .bmName{font-family:'Baloo 2';font-weight:800;font-size:19px}
+.buildModeCard .bmDesc{font-size:13px;opacity:.92;font-weight:700}
+/* elegir plantilla */
+.tplGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:360px;margin:6px auto}
+.tplCard{background:#fff;border:3px solid #fff;border-radius:18px;padding:18px 10px;box-shadow:0 5px 0 #cfae7f;text-align:center}
+.tplCard:active{transform:translateY(3px);box-shadow:0 2px 0 #cfae7f}
+.tplCard .tplEmoji{font-size:40px}
+.tplCard .tplName{font-family:'Baloo 2';font-weight:800;font-size:15px;color:var(--ink);margin-top:4px}
+/* colorear por números */
+.colorNums{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:6px 0 12px}
+.cnum{width:44px;height:44px;border-radius:12px;border:3px solid #fff;box-shadow:0 4px 0 #cfae7f;font-family:'Baloo 2';font-weight:800;font-size:18px;color:#fff;text-shadow:0 1px 2px #0007}
+.cnum.sel{outline:3px solid var(--ink);outline-offset:2px;transform:scale(1.08)}
+.pGrid{display:grid;gap:2px;width:100%;max-width:340px;margin:0 auto;background:#cdd6e8;border:4px solid #fff;border-radius:14px;box-shadow:0 8px 0 #cfae7f;padding:4px;touch-action:none;aspect-ratio:6/5}
+.pcell{background:#fff;border-radius:2px;display:grid;place-items:center;font-size:11px;font-weight:800;color:#b0b8c8;aspect-ratio:1}
+.pcell.vacio{background:transparent}
+.pcell.done{color:transparent}
+.pcell.wrongPick{animation:wpk .25s}
+@keyframes wpk{0%,100%{transform:scale(1)}50%{transform:scale(.92)}}
+/* comparación */
+.compareTitle{text-align:center;font-family:'Baloo 2';font-weight:800;font-size:20px;color:var(--ink);margin:6px 0 14px}
+.compareRow{display:flex;gap:12px;justify-content:center;max-width:360px;margin:0 auto}
+.compareCol{flex:1;text-align:center}
+.compareLabel{font-weight:800;color:#3a5a4a;font-size:13px;margin-bottom:6px}
+.miniArt{display:grid;gap:1px;width:100%;aspect-ratio:6/5;background:#eef1f6;border:3px solid #fff;border-radius:12px;box-shadow:0 5px 0 #cfae7f;padding:3px}
+.miniArt span{border-radius:1px;aspect-ratio:1}
+.realPhoto{width:100%;aspect-ratio:1;border:3px solid #fff;border-radius:12px;box-shadow:0 5px 0 #cfae7f;background:#dceaf5 center/cover no-repeat;display:grid;place-items:center;font-size:40px}
+.realPhoto.cargada{background-size:cover}
+.modeGrid{display:flex;flex-direction:column;gap:12px}
+.modeCard{border:0;border-radius:20px;padding:18px;text-align:left;color:#fff;display:flex;flex-direction:column;gap:2px}
+.modeCard:active{transform:translateY(3px)}
+.modeCard.m1{background:linear-gradient(150deg,#ff9d3f,#e0632a);box-shadow:0 6px 0 #b0431a}
+.modeCard.m2{background:linear-gradient(150deg,#4ec3f0,#3a8de0);box-shadow:0 6px 0 #2a6ab0}
+.modeCard .mcIcon{font-size:34px}
+.modeCard .mcName{font-family:'Baloo 2';font-weight:800;font-size:19px}
+.modeCard .mcDesc{font-size:13px;opacity:.94;font-weight:700}
+.guideOverlay{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(20,30,50,.55);backdrop-filter:blur(3px)}
+.guideCard{background:#fff;border-radius:28px;padding:24px 20px;max-width:340px;width:100%;text-align:center;box-shadow:0 16px 40px #0005;animation:guidePop .4s ease}
+@keyframes guidePop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.guideMascot svg{width:88px;height:88px}
+.guidePicto{font-size:44px;margin:6px 0}
+.guideTxt{font-family:'Baloo 2';font-weight:800;font-size:18px;color:var(--ink);line-height:1.35;margin-bottom:16px}
+.guideGo{max-width:260px;margin:0 auto}
+.guideSkip{display:block;margin:10px auto 0;background:none;border:0;color:#9aa4b4;font-weight:800;font-size:14px}
+.modeToggle{position:fixed;left:14px;bottom:calc(70px + env(safe-area-inset-bottom));background:#fff;border:3px solid #fff;color:var(--ink);padding:8px 14px;border-radius:99px;z-index:20;font-weight:800;font-size:13px;box-shadow:0 4px 0 #cfae7f}
+.modeToggle:active{transform:translateY(3px);box-shadow:0 1px 0 #cfae7f}
+</style></head><body>
+<div class="app" id="app">
+ <div class="clouds" id="clouds"></div>
+
+ <!-- ===== INICIO ===== -->
+ <section class="view active" id="v-home">
+  <div class="hud">
+   <div class="chip" id="chip"></div>
+   <div class="hudInfo">
+    <div class="hudName"><span id="hName">Explorador</span> <span class="lvlPill" id="hLvl">Nivel 1</span></div>
+    <div class="xpbar"><div class="xpfill" id="hXp"></div></div>
+   </div>
+   <div class="gems"><div class="gem">💎 <span id="hGems">0</span></div><div class="gem">⭐ <span id="hStars">0</span></div></div>
+  </div>
+
+  <div class="stage"><div class="glow"></div><div class="mascot" id="mascot" onclick="mascotTap()"></div></div>
+  <div class="speechWrap"><div class="speech" id="speech">¡Hola! ¿Listo para una aventura?</div></div>
+
+  <div class="daily" id="dailyCard">
+   <span class="tag">🎁 RETO DE HOY</span>
+   <h2 id="dailyTitle">Una aventura te espera</h2>
+   <p id="dailyDesc">Descubre algo nuevo y gana una carta.</p>
+   <button class="bigBtn go" id="dailyBtn">▶ ¡EMPEZAR AVENTURA!</button>
+  </div>
+
+  <button class="creatorCard" onclick="abrirArcade()">
+   <div class="ccIcon">🕹️</div>
+   <div class="ccText"><div class="ccTitle">Arcade de juegos</div><div class="ccDesc">7 juegos · ¡elige el tuyo! 🎮</div></div>
+   <div class="ccArrow">▶</div>
+  </button>
+
+  <div class="secTitle">🗺️ Tus mundos</div>
+  <div class="worlds" id="worlds"></div>
+
+  <div class="secTitle">🃏 Tu colección <span class="cnt" id="collCnt">0 / 0</span></div>
+  <div class="collect" id="collect"></div>
+ </section>
+
+ <!-- ===== MUNDO ===== -->
+ <section class="view" id="v-world">
+  <button class="back" onclick="goHome()">‹ Volver</button>
+  <div class="worldHead" id="worldHead"></div>
+  <div class="spots" id="spots"></div>
+ </section>
+
+ <!-- ===== DESCUBRIMIENTO ===== -->
+ <section class="view" id="v-disc">
+  <div class="discHead"><button class="back" id="discBack">‹ Volver</button></div>
+  <div class="photo" id="discPhoto"></div>
+  <div class="discTitle" id="discTitle"></div>
+  <div class="factBox"><div class="fb" id="discFb"></div><p id="discFact"></p></div>
+  <button class="bigBtn discBtn" id="discBtn">🎯 ¡ATRAPA EL TESORO!</button>
+ </section>
+
+ <!-- ===== MINI-JUEGO: ATRAPA EL TESORO ===== -->
+ <section class="view" id="v-catch">
+  <div class="catchHud">
+   <button class="back" id="catchBack">‹ Volver</button>
+   <div class="catchScore">✨ <span id="catchN">0</span> / <span id="catchGoal">8</span></div>
+   <div class="catchTime">⏱️ <span id="catchT">12</span></div>
+  </div>
+  <div class="catchBarWrap"><div class="catchBar" id="catchBar"></div></div>
+  <div class="catchArea" id="catchArea"></div>
+  <div class="catchHint" id="catchHint">¡Toca los tesoros que caen! 👆</div>
+ </section>
+
+ <!-- ===== MINI-JUEGO: LABERINTO ===== -->
+ <section class="view" id="v-maze">
+  <div class="catchHud">
+   <button class="back" id="mazeBack">‹ Volver</button>
+   <div class="catchScore" id="mazeTitle">🌀 Lleva a Dante al tesoro</div>
+  </div>
+  <div class="mazeWrap"><canvas id="mazeCanvas"></canvas></div>
+  <div class="mazeHint" id="mazeHint">Desliza el dedo o usa las flechas 👇</div>
+  <div class="dpad">
+   <div></div>
+   <button class="dbtn" onmousedown="mazeMove(0,-1)" ontouchstart="mazeTouch(event,0,-1)" aria-label="Arriba">⬆️</button>
+   <div></div>
+   <button class="dbtn" onmousedown="mazeMove(-1,0)" ontouchstart="mazeTouch(event,-1,0)" aria-label="Izquierda">⬅️</button>
+   <button class="dbtn dcenter" aria-hidden="true">🤖</button>
+   <button class="dbtn" onmousedown="mazeMove(1,0)" ontouchstart="mazeTouch(event,1,0)" aria-label="Derecha">➡️</button>
+   <div></div>
+   <button class="dbtn" onmousedown="mazeMove(0,1)" ontouchstart="mazeTouch(event,0,1)" aria-label="Abajo">⬇️</button>
+   <div></div>
+  </div>
+ </section>
+
+ <!-- ===== CARRERAS ===== -->
+ <section class="view" id="v-race">
+  <div class="catchHud">
+   <button class="back" id="raceBack">‹ Volver</button>
+   <div class="catchScore">🏁 Carrera</div>
+  </div>
+  <div class="catchBarWrap"><div class="catchBar" id="raceBar"></div></div>
+  <div class="raceArea" id="raceArea"></div>
+  <div class="raceCtrls">
+   <button class="raceBtn" id="raceLeft" aria-label="Izquierda">👈</button>
+   <button class="raceBtn" id="raceRight" aria-label="Derecha">👉</button>
+  </div>
+  <div class="mazeHint" id="raceHint">Toca los lados para esquivar 👈👉</div>
+ </section>
+
+ <!-- ===== PÁRAME LA MANO ===== -->
+ <section class="view" id="v-parame">
+  <div class="catchHud">
+   <button class="back" id="pmBack">‹ Volver</button>
+   <div class="catchScore" id="pmTitle">Párame la mano</div>
+   <div class="catchTime">⏱️ <span id="pmTime">6</span></div>
+  </div>
+  <div class="pmTimeWrap"><div class="pmTimeBar" id="pmTimeBar"></div></div>
+  <div class="pmProgress">Ronda <span id="pmNum">1</span> · aciertos <span id="pmScore">0</span>/<span id="pmTotal">5</span></div>
+  <div class="pmLetterBox">La letra es <span class="pmLetter" id="pmLetter">A</span></div>
+  <div class="pmQ" id="pmQ"></div>
+  <div class="pmOpts" id="pmOpts"></div>
+  <div class="mazeHint" id="pmHint">¡Toca la que empieza con esa letra!</div>
+ </section>
+
+ <!-- ===== PUNTERÍA LÁSER ===== -->
+ <section class="view" id="v-laser">
+  <div class="catchHud">
+   <button class="back" id="laserBack">‹ Volver</button>
+   <div class="catchScore">🎯 <span id="laserN">0</span> / <span id="laserGoal">12</span></div>
+   <div class="catchTime">⏱️ <span id="laserT">15</span></div>
+  </div>
+  <div class="catchBarWrap"><div class="catchBar" id="laserBar"></div></div>
+  <div class="laserArea" id="laserArea"></div>
+  <div class="mazeHint" id="laserHint">¡Toca los blancos! 🎯</div>
+ </section>
+
+ <!-- ===== ARCADE ===== -->
+ <section class="view" id="v-arcade">
+  <div class="catchHud">
+   <button class="back" id="arcadeBack">‹ Volver</button>
+   <div class="catchScore">🕹️ Arcade</div>
+  </div>
+  <div class="arcadeIntro">Elige un juego, <span id="arcadeName">explorador</span> 🎮</div>
+  <div class="arcadeGrid" id="arcadeGrid"></div>
+ </section>
+
+ <!-- ===== ARCADE ===== -->
+ <section class="view" id="v-arcade">
+  <div class="catchHud">
+   <button class="back" id="arcadeBack">‹ Volver</button>
+   <div class="catchScore">🕹️ Arcade</div>
+  </div>
+  <div class="arcadeIntro">¡Elige tu juego, explorador! 🎮</div>
+  <div class="arcadeGrid" id="arcadeGrid"></div>
+ </section>
+
+ <!-- ===== RAYUELA SENSORIAL ===== -->
+ <section class="view" id="v-ray">
+  <div class="catchHud">
+   <button class="back" id="rayBack">‹ Volver</button>
+   <div class="catchScore" id="rayMode">Rayuela</div>
+   <div class="catchScore" id="rayGoal">🏁</div>
+  </div>
+  <div class="rayField"><div class="rayCasillas" id="rayCasillas"></div></div>
+  <div class="mazeHint" id="rayHint">Salta hasta el final 🌀</div>
+ </section>
+
+ <!-- ===== CONSTRUCTOR DE BLOQUES ===== -->
+ <section class="view" id="v-build">
+  <div class="catchHud">
+   <button class="back" id="buildBack">‹ Volver</button>
+   <div class="catchScore">🎨 Taller</div>
+  </div>
+  <div id="buildWrap"></div>
+  <div class="mazeHint" id="buildHint">¿Qué quieres hacer hoy? 🎨</div>
+ </section>
+
+ <!-- ===== RETO ===== -->
+ <section class="view" id="v-quiz">
+  <div class="discHead"><button class="back" id="quizBack">‹ Volver</button></div>
+  <div class="photo" id="quizPhoto" style="aspect-ratio:16/7"></div>
+  <div class="quizQ" id="quizQ"></div>
+  <div class="opts" id="quizOpts"></div>
+ </section>
+
+ <!-- ===== RECOMPENSA ===== -->
+ <section class="view" id="v-reward">
+  <div class="reward">
+   <div class="rewardTitle" id="rewardTitle">¡Lo lograste!</div>
+   <div class="rewardCard" id="rewardCard"></div>
+   <div class="xpGain" id="xpGain">+50 XP</div>
+   <p style="font-weight:800;color:#3a5a4a;margin:6px 16px 0" id="rewardMsg">Ganaste una carta nueva para tu colección.</p>
+   <button class="bigBtn mt16" id="rewardBtn" style="max-width:300px;margin-left:auto;margin-right:auto">🏠 SEGUIR EXPLORANDO</button>
+  </div>
+ </section>
+
+ <!-- ===== ¿TE GUSTÓ? (voz de Dante) ===== -->
+ <section class="view" id="v-opinion">
+  <div class="opinionBox">
+   <div class="opMascot" id="opMascot"></div>
+   <div class="opTitle" id="opTitle">¿Te gustó, explorador?</div>
+   <p class="opSub">Tu opinión hace crecer DANTE LAB 🚀</p>
+   <div class="opFaces" id="opFaces">
+    <button class="opFace" data-v="genial" title="¡Genial!">😍</button>
+    <button class="opFace" data-v="bien" title="Estuvo bien">🙂</button>
+    <button class="opFace" data-v="normal" title="Más o menos">😐</button>
+    <button class="opFace" data-v="aburrido" title="Aburrido">😴</button>
+   </div>
+   <div class="opThanks" id="opThanks"></div>
+   <button class="bigBtn mt16" id="opSkip" style="max-width:300px;margin:10px auto 0;background:#eef1f6;color:#6a7488;box-shadow:0 5px 0 #cfd6e0">Saltar</button>
+  </div>
+ </section>
+
+</div>
+
+<!-- ===== GATE ===== -->
+<div id="gate">
+ <div class="gc">
+  <span class="badge">✨ Tu laboratorio tiene algo nuevo</span>
+  <div class="gm" id="gateMascot"></div>
+  <h1 id="gateHi">¡Hola, explorador! 👋</h1>
+  <p>Hoy hay una aventura nueva esperándote.</p>
+  <p>Toca y descubre el mundo conmigo.</p>
+  <button class="bigBtn enter" onclick="openGate()">¿LISTO? ¡VAMOS! 🚀</button>
+ </div>
+</div>
+
+<button class="modeToggle" id="modeToggle" onclick="cambiarModo()">🌈 Modo</button>
+<button class="sndBtn" id="sndBtn" onclick="toggleSnd()" aria-label="Sonido">🔊</button>
+<div class="toast" id="toast"></div>
+
+<script src="./data.js"></script>
+<script src="./photos.js"></script>
+<script src="./sfx.js"></script>
+<script src="./fx.js"></script>
+<script src="./iconos.js"></script>
+<script src="./dificultad.js"></script>
+<script src="./minijuego.js"></script>
+<script src="./laberinto.js"></script>
+<script src="./carreras.js"></script>
+<script src="./parame.js"></script>
+<script src="./laser.js"></script>
+<script src="./rayuela.js"></script>
+<script src="./plantillas.js"></script>
+<script src="./constructor.js"></script>
+<script src="./guia.js"></script>
+<script src="./arcade.js"></script>
+<script src="./app.js"></script>
+</body></html>

@@ -113,6 +113,22 @@ function render(){
   // saludo mascota
   document.getElementById('speech').textContent = saludo();
 
+  // META actual (objetivo que jala) + rango de explorador
+  if(window.PROGRESO){
+    const meta=PROGRESO.metaActual();
+    const mc=document.getElementById('metaCard');
+    if(meta && mc){
+      mc.style.display='block';
+      document.getElementById('metaTxt').textContent='Completa '+meta.nombre+': '+meta.hechas+'/'+meta.total;
+      document.getElementById('metaBar').style.width=(meta.hechas/meta.total*100)+'%';
+      document.getElementById('metaReward').textContent='🎁 Recompensa: '+meta.recompensa;
+    } else if(mc){ mc.style.display='none'; }
+    // rango en el HUD (junto al nivel)
+    const r=PROGRESO.rango(S.nivel);
+    const hl=document.getElementById('hLvl');
+    if(hl) hl.textContent = r.emoji+' Nivel '+S.nivel;
+  }
+
   // mundos
   const wc = document.getElementById('worlds'); wc.innerHTML='';
   MUNDOS.forEach(m=>{
@@ -333,10 +349,55 @@ function recompensa(acierto){
   document.getElementById('rewardMsg').textContent = yaLoTenia
      ? 'Ya tenías esta carta, ¡pero ganaste XP igual!'
      : (subio? '¡Nueva carta y SUBISTE al Nivel '+S.nivel+'! 🎊' : 'Ganaste una carta nueva para tu colección.');
-  document.getElementById('rewardBtn').onclick=abrirOpinion;
+  document.getElementById('rewardBtn').onclick=()=>continuarTrasRecompensa(subio, discActual.mundo?discActual.mundo.id:null);
   if(acierto||!yaLoTenia) lanzarConfeti();
   if(window.SFX){ if(subio) SFX.nivel(); else if(!yaLoTenia) SFX.premio(); }
   show('v-reward');
+}
+
+/* ---------- tras la recompensa: celebrar nivel y desbloqueos ---------- */
+function continuarTrasRecompensa(subio, mundoId){
+  // 1) ¿subió de nivel? -> celebración grande
+  if(subio){ mostrarLevelUp(); return; }
+  // 2) ¿completó un mundo? -> desbloqueo
+  if(mundoId && window.PROGRESO){
+    const rec=PROGRESO.revisarMundoCompleto(mundoId);
+    if(rec){ mostrarUnlock(rec); return; }
+  }
+  // 3) nada especial -> opinión
+  abrirOpinion();
+}
+
+function mostrarLevelUp(){
+  const r = window.PROGRESO ? PROGRESO.rango(S.nivel) : {emoji:'⭐',nombre:'Explorador'};
+  document.getElementById('luBadge').textContent = r.emoji;
+  document.getElementById('luRank').textContent = r.nombre;
+  document.getElementById('luSub').textContent = 'Ahora eres Nivel '+S.nivel+'. ¡Cada vez más fuerte!';
+  document.getElementById('levelUp').classList.add('show');
+  if(window.SFX) SFX.nivel();
+  if(window.FX){ setTimeout(()=>{ for(let k=0;k<4;k++) setTimeout(()=>FX.burst(80+Math.random()*220, 150+Math.random()*200,{n:20,spread:130}), k*200); }, 300); }
+}
+function cerrarLevelUp(){
+  document.getElementById('levelUp').classList.remove('show');
+  // tras el nivel, revisar si además completó un mundo
+  const mundoId = discActual && discActual.mundo ? discActual.mundo.id : null;
+  if(mundoId && window.PROGRESO){
+    const rec=PROGRESO.revisarMundoCompleto(mundoId);
+    if(rec){ return mostrarUnlock(rec); }
+  }
+  abrirOpinion();
+}
+
+function mostrarUnlock(rec){
+  document.getElementById('unlockEmoji').textContent = rec.emoji;
+  document.getElementById('unlockName').textContent = rec.nombre;
+  document.getElementById('unlockScreen').classList.add('show');
+  if(window.SFX) SFX.premio();
+  if(window.FX){ setTimeout(()=>{ for(let k=0;k<3;k++) setTimeout(()=>FX.burst(100+Math.random()*180, 180+Math.random()*160,{n:16,spread:110}), k*180); }, 300); }
+}
+function cerrarUnlock(){
+  document.getElementById('unlockScreen').classList.remove('show');
+  abrirOpinion();
 }
 
 /* ---------- confeti ---------- */

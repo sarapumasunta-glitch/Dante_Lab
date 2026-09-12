@@ -13,20 +13,28 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap');
 :root{
- --ink:#26324a;          /* texto principal (no negro puro: mejor para dislexia) */
- --sky1:#8ed6f5; --sky2:#a8e6c8; --sky3:#d6f0b0;
- --card:#ffffff; --cardEdge:#ffffff;
- --amber:#ff9d2a; --amberDeep:#d0681a;
- --pink:#ff6f9c; --pinkDeep:#c93d6e;
- --oc:#2a8fd0; --ocDeep:#1a6fa8;
- --an:#3aa85a; --anDeep:#2a8040;
- --es:#7a4ac8; --esDeep:#5a2aa0;
- --lu:#e0762a; --luDeep:#b0561a;
+ --ink:#f0f4ff;
+ --inkSoft:#b8c4e0;
+ --sky1:#1a1442; --sky2:#241a5c; --sky3:#2d1f6e;
+ --card:#2a2450; --cardEdge:#3d3470;
+ --amber:#ffb02e; --amberDeep:#e07a10;
+ --pink:#ff4d9d; --pinkDeep:#d61f7a;
+ --oc:#22a7ff; --ocDeep:#1478d0;
+ --an:#2fd479; --anDeep:#1a9e54;
+ --es:#a855f7; --esDeep:#7c2fd6;
+ --lu:#ff8c1a; --luDeep:#d9600a;
  --sun:#ffd23f; --sunEdge:#e0aa10;
+ --glow:0 0 20px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{font-family:'Nunito',system-ui,sans-serif;color:var(--ink);background:#a8e6c8;-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{font-family:'Nunito',system-ui,sans-serif;color:var(--ink);
+ background:
+  radial-gradient(circle at 15% 8%,#3d2a8a 0%,transparent 42%),
+  radial-gradient(circle at 88% 12%,#7c2fa0 0%,transparent 40%),
+  radial-gradient(circle at 50% 100%,#1478a0 0%,transparent 55%),
+  linear-gradient(180deg,#1a1442 0%,#0f0a2e 100%);
+ background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden}
 button{font:inherit;cursor:pointer;border:0;color:inherit}
 img{max-width:100%}
 
@@ -40,7 +48,7 @@ img{max-width:100%}
 @keyframes pop{0%{transform:scale(.7);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
 
 /* ---------- HUD ---------- */
-.hud{display:flex;align-items:center;gap:10px;margin-bottom:10px;background:#ffffffe8;border:3px solid #fff;border-radius:22px;padding:8px 12px;box-shadow:0 5px 0 #cfae7f, 0 8px 16px #0002;margin-top:env(safe-area-inset-top)}
+.hud{display:flex;align-items:center;gap:10px;margin-bottom:10px;background:#2a245099;backdrop-filter:blur(10px);border:2px solid var(--cardEdge);border-radius:22px;padding:8px 12px;box-shadow:0 6px 18px #0004;margin-top:env(safe-area-inset-top)}
 .chip{width:50px;height:50px;border-radius:15px;background:linear-gradient(160deg,#ffe08a,#ffb04a);display:grid;place-items:center;box-shadow:0 4px 0 var(--sunEdge);flex-shrink:0}
 .chip svg{width:38px;height:38px}
 .hudInfo{flex:1;min-width:0}
@@ -61,11 +69,11 @@ img{max-width:100%}
 @keyframes jump{0%,100%{transform:translateY(0)}40%{transform:translateY(-40px) rotate(8deg)}}
 .mascot svg{width:158px;height:158px;filter:drop-shadow(0 12px 14px #4a904055)}
 .speechWrap{text-align:center;margin-top:2px;min-height:56px}
-.speech{background:#fff;color:#33405c;font-family:'Baloo 2';font-weight:700;font-size:15px;padding:11px 17px;border-radius:20px;display:inline-block;position:relative;box-shadow:0 5px 0 #d9e2ec;max-width:310px;line-height:1.3}
+.speech{background:#2a2450;color:var(--ink);font-family:'Baloo 2';font-weight:700;font-size:15px;padding:11px 17px;border-radius:20px;display:inline-block;position:relative;box-shadow:0 5px 18px #0004;border:2px solid var(--cardEdge);max-width:310px;line-height:1.3}
 .speech::after{content:"";position:absolute;top:-9px;left:50%;transform:translateX(-50%);border:9px solid transparent;border-bottom-color:#fff;border-top:0}
 
 /* ---------- botón grande accesible (min 48px, mucho aire) ---------- */
-.bigBtn{width:100%;background:var(--sun);color:#6a3a00;font-family:'Baloo 2';font-weight:800;font-size:19px;padding:16px;border-radius:18px;box-shadow:0 6px 0 var(--sunEdge);min-height:56px;transition:transform .1s,box-shadow .1s}
+.bigBtn{width:100%;background:linear-gradient(150deg,#ffd93f,#ffb02e);color:#4a2e00;font-family:'Baloo 2';font-weight:800;font-size:19px;padding:16px;border-radius:18px;box-shadow:0 6px 0 var(--sunEdge),0 0 22px #ffd23f66;min-height:56px;transition:transform .1s,box-shadow .1s}
 .bigBtn:active{transform:translateY(5px);box-shadow:0 1px 0 var(--sunEdge)}
 
 /* ---------- tarjeta reto del día ---------- */
@@ -77,12 +85,12 @@ img{max-width:100%}
 .daily .go:active{box-shadow:0 1px 0 #e8c9a0}
 
 /* ---------- secciones ---------- */
-.secTitle{font-family:'Baloo 2';font-weight:800;font-size:18px;color:#2f5a3a;margin:22px 4px 12px;display:flex;align-items:center;gap:8px}
+.secTitle{font-family:'Baloo 2';font-weight:800;font-size:18px;color:var(--ink);margin:22px 4px 12px;display:flex;align-items:center;gap:8px;text-shadow:0 0 12px #ffffff33}
 .secTitle .cnt{margin-left:auto;font-size:13px;color:var(--amberDeep);background:#fff;padding:2px 11px;border-radius:99px;font-weight:900}
 
 /* ---------- mundos ---------- */
 .worlds{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.world{border-radius:24px;padding:15px;min-height:132px;position:relative;overflow:hidden;text-align:left;color:#fff;border:4px solid #fff;box-shadow:0 7px 0 rgba(0,0,0,.18);transition:transform .12s}
+.world{border-radius:24px;padding:15px;min-height:132px;position:relative;overflow:hidden;text-align:left;color:#fff;border:2px solid #ffffff33;box-shadow:0 8px 22px #0005,inset 0 1px 0 #ffffff30;transition:transform .12s}
 .world:active{transform:scale(.96)}
 .world .we{font-size:42px;filter:drop-shadow(0 3px 4px #0004);line-height:1}
 .world .we svg{width:46px;height:46px}
@@ -96,18 +104,18 @@ img{max-width:100%}
 
 /* ---------- colección ---------- */
 .collect{display:flex;gap:10px;margin-top:4px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}
-.card{flex-shrink:0;width:74px;height:98px;border-radius:16px;background:#ffffff70;border:3px dashed #ffffffcc;display:grid;place-items:center;font-size:30px;scroll-snap-align:start;color:#7a8a6a}
+.card{flex-shrink:0;width:74px;height:98px;border-radius:16px;background:#ffffff10;border:3px dashed #ffffff30;display:grid;place-items:center;font-size:30px;scroll-snap-align:start;color:var(--inkSoft)}
 .card.got{border:3px solid #fff;background:linear-gradient(160deg,#fff6e2,#ffe2b2);box-shadow:0 5px 0 #e8c9a0aa;cursor:pointer}
 
 /* ============ MUNDO (detalle) ============ */
-.back{background:#ffffffcc;border:3px solid #fff;color:var(--ink);font-family:'Baloo 2';font-weight:800;font-size:15px;padding:9px 16px;border-radius:99px;box-shadow:0 4px 0 #cfae7f;display:inline-flex;align-items:center;gap:6px;min-height:44px}
+.back{background:#2a2450cc;border:2px solid var(--cardEdge);color:var(--ink);font-family:'Baloo 2';font-weight:800;font-size:15px;padding:9px 16px;border-radius:99px;box-shadow:0 4px 12px #0004;display:inline-flex;align-items:center;gap:6px;min-height:44px}
 .worldHead{border-radius:26px;padding:22px;color:#fff;margin:6px 0 16px;position:relative;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 0 rgba(0,0,0,.2)}
 .worldHead .big{font-size:64px;line-height:1;filter:drop-shadow(0 4px 6px #0005)}
 .worldHead .big svg{width:68px;height:68px}
 .worldHead h1{font-family:'Baloo 2';font-weight:800;font-size:28px;margin-top:4px}
 .worldHead p{font-weight:800;opacity:.95;margin-top:2px;font-size:14px;line-height:1.35}
 .spots{display:grid;gap:12px}
-.spot{background:#fff;border:4px solid #fff;border-radius:22px;padding:14px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 0 #d8cbb4;text-align:left;transition:transform .12s}
+.spot{background:var(--card);border:2px solid var(--cardEdge);border-radius:22px;padding:14px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 18px #0004,inset 0 1px 0 #ffffff18;text-align:left;transition:transform .12s}
 .spot.nuevo{border-color:#ffd23f;box-shadow:0 6px 0 #d9a72a;animation:spotGlow 2s infinite}
 @keyframes spotGlow{0%,100%{box-shadow:0 6px 0 #d9a72a}50%{box-shadow:0 6px 0 #d9a72a,0 0 16px #ffd23f88}}
 .spot.done{opacity:.82}
@@ -115,7 +123,7 @@ img{max-width:100%}
 .spot .se{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-size:32px;flex-shrink:0;color:#fff}
 .spot .st{flex:1;min-width:0}
 .spot .st b{font-family:'Baloo 2';font-weight:800;font-size:16px;display:block;color:var(--ink);line-height:1.15}
-.spot .st span{font-size:12px;font-weight:800;color:#8a93a6}
+.spot .st span{font-size:12px;font-weight:800;color:var(--inkSoft)}
 .spot .chev{font-size:22px;color:#c3ccd8}
 .spot.done{opacity:.75}
 .spot.done .se::after{content:"✓";position:absolute;font-size:16px;background:var(--an);color:#fff;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;transform:translate(20px,-20px);border:2px solid #fff}
@@ -126,7 +134,7 @@ img{max-width:100%}
 .photo{width:100%;aspect-ratio:4/3;border-radius:24px;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 0 rgba(0,0,0,.15);background:#1a2a4a;position:relative}
 .realBadge{position:absolute;bottom:10px;right:10px;background:#00000088;color:#fff;font-size:11px;font-weight:800;padding:4px 10px;border-radius:99px;backdrop-filter:blur(4px)}
 .discTitle{font-family:'Baloo 2';font-weight:800;font-size:24px;margin:16px 4px 6px;line-height:1.1;color:var(--ink)}
-.factBox{background:#fff;border:4px solid #fff;border-radius:22px;padding:16px;box-shadow:0 6px 0 #d8cbb4;display:flex;gap:12px;align-items:flex-start}
+.factBox{background:var(--card);border:2px solid var(--cardEdge);border-radius:22px;padding:16px;box-shadow:0 6px 18px #0004,inset 0 1px 0 #ffffff18;display:flex;gap:12px;align-items:flex-start}
 .factBox .fb{width:44px;height:44px;flex-shrink:0}
 .factBox p{font-size:15.5px;font-weight:800;line-height:1.45;color:#3a4560}
 .discBtn{margin-top:16px}
@@ -134,7 +142,7 @@ img{max-width:100%}
 /* ============ RETO (mini-juego) ============ */
 .quizQ{font-family:'Baloo 2';font-weight:800;font-size:22px;text-align:center;margin:10px 8px 18px;color:var(--ink);line-height:1.2}
 .opts{display:grid;gap:12px}
-.opt{background:#fff;border:4px solid #fff;border-radius:20px;padding:16px 18px;font-family:'Baloo 2';font-weight:700;font-size:17px;text-align:left;box-shadow:0 6px 0 #d8cbb4;min-height:56px;display:flex;align-items:center;gap:12px;transition:transform .1s}
+.opt{background:var(--card);border:2px solid var(--cardEdge);border-radius:20px;padding:16px 18px;font-family:'Baloo 2';font-weight:700;font-size:17px;text-align:left;box-shadow:0 6px 18px #0004,inset 0 1px 0 #ffffff18;min-height:56px;color:var(--ink);display:flex;align-items:center;gap:12px;transition:transform .1s}
 .opt:active{transform:scale(.98)}
 .opt .letter{width:32px;height:32px;border-radius:10px;background:#eef3f8;display:grid;place-items:center;font-weight:900;color:#7a8aa0;flex-shrink:0}
 .opt.right{background:#e7f8ec;border-color:var(--an);box-shadow:0 6px 0 var(--anDeep)}
@@ -157,14 +165,17 @@ img{max-width:100%}
 #gate{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
  padding:calc(env(safe-area-inset-top) + 20px) 22px calc(env(safe-area-inset-bottom) + 20px);
  overflow-y:auto;-webkit-overflow-scrolling:touch;
- background:linear-gradient(180deg,#8ed6f5,#a8e6c8 60%,#d6f0b0)}
+ background:
+  radial-gradient(circle at 20% 15%,#3d2a8a 0%,transparent 45%),
+  radial-gradient(circle at 85% 80%,#7c2fa0 0%,transparent 42%),
+  linear-gradient(180deg,#1a1442,#0f0a2e)}
 #gate.hide{opacity:0;pointer-events:none;transition:.5s}
 #gate .gc{max-width:360px;width:100%;margin:auto;animation:fade .6s ease}
 #gate .badge{background:#fff;color:var(--amberDeep);font-weight:900;font-size:12px;letter-spacing:.06em;padding:6px 14px;border-radius:99px;box-shadow:0 4px 0 #e8c9a0;display:inline-block}
 #gate .gm{margin:14px auto}
 #gate .gm svg{width:130px;height:130px;filter:drop-shadow(0 12px 16px #4a904055);animation:bob 2.6s infinite ease-in-out}
-#gate h1{font-family:'Baloo 2';font-weight:800;font-size:28px;color:var(--ink);margin:6px 0}
-#gate p{font-weight:800;color:#3a5a4a;line-height:1.4;margin-bottom:4px}
+#gate h1{font-family:'Baloo 2';font-weight:800;font-size:28px;color:var(--ink);margin:6px 0;text-shadow:0 0 16px #a855f766}
+#gate p{font-weight:800;color:var(--inkSoft);line-height:1.4;margin-bottom:4px}
 #gate .enter{margin-top:16px}
 /* pantallas cortas (iPhone X y similares): compactar para que TODO quepa y el botón se vea */
 @media(max-height:740px){
@@ -177,8 +188,8 @@ img{max-width:100%}
 }
 
 /* nombre */
-.nameCard{background:#fff;border:4px solid #fff;border-radius:26px;padding:24px;box-shadow:0 8px 0 #d8cbb4;text-align:center;margin-top:8px}
-.nameCard input{width:100%;font-family:'Baloo 2';font-weight:700;font-size:22px;text-align:center;padding:15px;border:3px solid #e2e8f0;border-radius:16px;color:var(--ink)}
+.nameCard{background:var(--card);border:2px solid var(--cardEdge);border-radius:26px;padding:24px;box-shadow:0 8px 24px #0005;text-align:center;margin-top:8px}
+.nameCard input{width:100%;font-family:'Baloo 2';font-weight:700;font-size:22px;text-align:center;padding:15px;border:3px solid var(--cardEdge);border-radius:16px;color:var(--ink);background:#1a1540}
 .nameCard input:focus{outline:none;border-color:var(--oc)}
 
 /* toast */
@@ -196,7 +207,7 @@ img{max-width:100%}
 /* ===== mini-juego Atrapa el tesoro ===== */
 #v-catch{padding-bottom:0}
 .catchHud{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-.catchScore,.catchTime{background:#fff;border:3px solid #fff;border-radius:99px;padding:5px 12px;font-weight:900;font-size:15px;color:var(--ink);box-shadow:0 4px 0 #cfae7f}
+.catchScore,.catchTime{background:#2a2450cc;border:2px solid var(--cardEdge);border-radius:99px;padding:5px 12px;font-weight:900;font-size:15px;color:var(--ink);box-shadow:0 4px 12px #0004}
 .catchTime{color:var(--amberDeep)}
 .catchBarWrap{height:16px;background:#ffffffcc;border-radius:99px;overflow:hidden;border:3px solid #fff;box-shadow:0 3px 0 #cfae7f;margin-bottom:10px}
 .catchBar{height:100%;width:0%;background:linear-gradient(90deg,#ff9d2a,#ff6f9c);border-radius:99px;transition:width .2s}
@@ -205,6 +216,8 @@ img{max-width:100%}
 .falling{position:absolute;font-size:44px;top:-60px;cursor:pointer;user-select:none;will-change:transform;
  filter:drop-shadow(0 3px 4px #0003);transition:transform .08s}
 .falling:active{transform:scale(1.3)}
+.falling.bonus{filter:drop-shadow(0 0 12px #ffd23f) drop-shadow(0 0 6px #ffd23f);animation:bonusGlow .6s infinite alternate}
+@keyframes bonusGlow{from{transform:scale(1)}to{transform:scale(1.15)}}
 .falling.pop{animation:popOut .3s forwards}
 @keyframes popOut{to{transform:scale(1.8);opacity:0}}
 .catchHint{text-align:center;font-family:'Baloo 2';font-weight:800;color:#3a5a4a;margin-top:10px;font-size:15px}
@@ -219,7 +232,7 @@ img{max-width:100%}
 .dbtn:active{transform:translateY(4px);box-shadow:0 1px 0 #cfae7f}
 .dcenter{background:#fff3d6;box-shadow:0 5px 0 #e0c080;pointer-events:none}
 /* ===== Carreras ===== */
-.raceArea{position:relative;width:100%;height:56vh;max-height:460px;border-radius:24px;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 0 #cfae7f}
+.raceArea{position:relative;width:100%;height:56vh;max-height:460px;border-radius:24px;overflow:hidden;border:2px solid #ffffff22;box-shadow:0 8px 24px #0006}
 .raceTrack{position:absolute;inset:0}
 .raceLine{position:absolute;top:0;bottom:0;width:4px;background:repeating-linear-gradient(#ffffffcc 0 18px,transparent 18px 36px);transform:translateX(-2px)}
 .racer{position:absolute;bottom:12px;font-size:46px;transform:translateX(-50%);transition:left .12s;filter:drop-shadow(0 3px 4px #0005);z-index:2}
@@ -241,20 +254,23 @@ img{max-width:100%}
 .pmLetter{display:inline-grid;place-items:center;width:52px;height:52px;background:linear-gradient(150deg,#ff9d2a,#ff6f9c);color:#fff;border-radius:16px;font-size:30px;vertical-align:middle;margin-left:6px;box-shadow:0 5px 0 #cf6a3a}
 .pmQ{text-align:center;font-family:'Baloo 2';font-weight:800;font-size:19px;color:var(--ink);margin:10px 0 14px}
 .pmOpts{display:flex;flex-direction:column;gap:12px}
-.pmOpt{padding:18px;border-radius:18px;background:#fff;border:3px solid #fff;box-shadow:0 5px 0 #cfae7f;font-family:'Baloo 2';font-weight:700;font-size:19px;color:var(--ink);text-align:left}
+.pmOpt{padding:18px;border-radius:18px;background:var(--card);border:2px solid var(--cardEdge);color:var(--ink);box-shadow:0 5px 0 #cfae7f;font-family:'Baloo 2';font-weight:700;font-size:19px;color:var(--ink);text-align:left}
 .pmOpt:active{transform:translateY(3px);box-shadow:0 2px 0 #cfae7f}
 .pmOpt.right{background:#d6f5c8;border-color:#7ac86a;box-shadow:0 5px 0 #5aa84a}
 .pmOpt.wrong{background:#fff6d6;border-color:#ffd23f;box-shadow:0 5px 0 #d9a72a}
 .pmOpt:disabled{opacity:1}
 
 /* ===== Puntería láser ===== */
-.laserArea{position:relative;width:100%;height:56vh;max-height:460px;border-radius:24px;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 0 #cfae7f}
+.laserArea{position:relative;width:100%;height:56vh;max-height:460px;border-radius:24px;overflow:hidden;border:2px solid #ffffff22;box-shadow:0 8px 24px #0006}
 .laserTarget{position:absolute;width:64px;height:64px;display:grid;place-items:center;cursor:pointer;animation:appear .18s ease}
 @keyframes appear{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
 .laserTarget .ring{position:absolute;inset:0;border-radius:50%;border:4px solid #ffffffcc;box-shadow:0 0 14px #ffffff88, inset 0 0 10px #ffffff55;animation:pulseRing 1s infinite}
 @keyframes pulseRing{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.12);opacity:.5}}
 .laserTarget .em{font-size:34px;z-index:2;filter:drop-shadow(0 2px 3px #0006)}
 .laserTarget.bad .ring{border-color:#ff5a5a;box-shadow:0 0 14px #ff5a5a}
+.laserTarget.bonus .ring{border-color:#ffd23f;box-shadow:0 0 20px #ffd23f,0 0 30px #ffd23faa;animation:pulseRing .5s infinite}
+.laserTarget.bonus .em{animation:bonusSpin 1s linear infinite}
+@keyframes bonusSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .laserTarget.hit{animation:hitFx .22s forwards}
 @keyframes hitFx{to{transform:scale(1.7);opacity:0;filter:brightness(2)}}
 .laserTarget.boom{animation:boomFx .3s forwards}
@@ -263,16 +279,16 @@ img{max-width:100%}
 @keyframes fadeOut{to{opacity:0;transform:scale(.7)}}
 /* ===== elegir superpoder ===== */
 .powerGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.powerCard{background:#fff;border:3px solid #fff;border-radius:18px;padding:14px 8px;box-shadow:0 5px 0 #cfae7f;text-align:center}
+.powerCard{background:var(--card);border:2px solid var(--cardEdge);border-radius:18px;padding:14px 8px;box-shadow:0 5px 14px #0004;text-align:center}
 .powerCard:active{transform:translateY(3px);box-shadow:0 2px 0 #cfae7f}
-.powerCard.sel{border-color:#7ac86a;background:#eafce0;box-shadow:0 5px 0 #5aa84a}
+.powerCard.sel{border-color:#2fd479;background:#1a3a2e;box-shadow:0 0 18px #2fd47966}
 .powerCard .pe{font-size:36px}
 .powerCard .pn{font-family:'Baloo 2';font-weight:800;font-size:16px;color:var(--ink);margin-top:4px}
-.powerCard .pd{font-size:12px;color:#6a7a6a;margin-top:2px}
+.powerCard .pd{font-size:12px;color:var(--inkSoft);margin-top:2px}
 /* ===== Rayuela sensorial ===== */
 .rayField{width:100%;max-width:360px;margin:6px auto 0;background:linear-gradient(180deg,#eaf6ff,#dff5c8);border:4px solid #fff;border-radius:24px;box-shadow:0 8px 0 #cfae7f;padding:14px}
 .rayCasillas{display:flex;flex-direction:column-reverse;gap:10px}
-.rayCell{width:88px;min-height:56px;border-radius:16px;background:#fff;border:3px solid #fff;box-shadow:0 5px 0 #cfae7f;display:grid;place-items:center;position:relative}
+.rayCell{width:88px;min-height:56px;border-radius:16px;background:var(--card);border:3px solid #3d3470;fff;box-shadow:0 5px 0 #cfae7f;display:grid;place-items:center;position:relative}
 .rayCell .rn{font-family:'Baloo 2';font-weight:800;font-size:20px;color:#9aa6bd}
 .rayCell.target{background:#fff6cc;border-color:#ffd23f;box-shadow:0 5px 0 #d9a72a;animation:rayPulse 1s infinite}
 @keyframes rayPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
@@ -304,18 +320,18 @@ img{max-width:100%}
 /* ===== Arcade ===== */
 .arcadeIntro{text-align:center;font-family:'Baloo 2';font-weight:800;font-size:19px;color:var(--ink);margin:8px 0 16px}
 .arcadeGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.arcadeCard{background:#fff;border:3px solid #fff;border-radius:22px;padding:16px 12px;box-shadow:0 6px 0 #cfae7f;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
+.arcadeCard{background:var(--card);border:2px solid var(--cardEdge);border-radius:22px;padding:16px 12px;box-shadow:0 6px 18px #0004,inset 0 1px 0 #ffffff18;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
 .arcadeCard:active{transform:translateY(4px);box-shadow:0 2px 0 #cfae7f}
 .arcadeCard .acIcon{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;margin-bottom:4px}
 .arcadeCard .acIcon svg{width:44px;height:44px}
 .arcadeCard .acName{font-family:'Baloo 2';font-weight:800;font-size:16px;color:var(--ink)}
-.arcadeCard .acDesc{font-size:12px;color:#7a8496;font-weight:700;line-height:1.2}
+.arcadeCard .acDesc{font-size:12px;color:var(--inkSoft);font-weight:700;line-height:1.2}
 .arcadeCard .acLvl{margin-top:4px;font-size:11px;font-weight:900;color:#e0762a;background:#fff3d6;padding:2px 8px;border-radius:99px}
 /* ===== ¿te gustó? ===== */
-.opinionBox{max-width:360px;margin:20px auto 0;background:#fff;border:4px solid #fff;border-radius:26px;box-shadow:0 8px 0 #cfae7f;padding:24px 18px;text-align:center}
+.opinionBox{max-width:360px;margin:20px auto 0;background:var(--card);border:2px solid var(--cardEdge);border-radius:26px;box-shadow:0 8px 0 #cfae7f;padding:24px 18px;text-align:center}
 .opMascot svg{width:88px;height:88px}
 .opTitle{font-family:'Baloo 2';font-weight:800;font-size:22px;color:var(--ink);margin-top:6px}
-.opSub{font-weight:800;color:#7a8496;font-size:14px;margin:4px 0 16px}
+.opSub{font-weight:800;color:var(--inkSoft);font-size:14px;margin:4px 0 16px}
 .opFaces{display:flex;justify-content:center;gap:10px}
 .opFace{width:62px;height:62px;border-radius:18px;background:#f4f7fc;border:3px solid #eef1f6;font-size:34px;box-shadow:0 4px 0 #d8dee8}
 .opFace:active{transform:translateY(3px);box-shadow:0 1px 0 #d8dee8}
@@ -332,7 +348,7 @@ img{max-width:100%}
 .buildModeCard .bmDesc{font-size:13px;opacity:.92;font-weight:700}
 /* elegir plantilla */
 .tplGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:360px;margin:6px auto}
-.tplCard{background:#fff;border:3px solid #fff;border-radius:18px;padding:18px 10px;box-shadow:0 5px 0 #cfae7f;text-align:center}
+.tplCard{background:var(--card);border:3px solid #fff;border-radius:18px;padding:18px 10px;box-shadow:0 5px 0 #cfae7f;text-align:center}
 .tplCard:active{transform:translateY(3px);box-shadow:0 2px 0 #cfae7f}
 .tplCard .tplEmoji{font-size:40px}
 .tplCard .tplName{font-family:'Baloo 2';font-weight:800;font-size:15px;color:var(--ink);margin-top:4px}
@@ -364,7 +380,7 @@ img{max-width:100%}
 .modeCard .mcName{font-family:'Baloo 2';font-weight:800;font-size:19px}
 .modeCard .mcDesc{font-size:13px;opacity:.94;font-weight:700}
 .guideOverlay{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(20,30,50,.55);backdrop-filter:blur(3px)}
-.guideCard{background:#fff;border-radius:28px;padding:24px 20px;max-width:340px;width:100%;text-align:center;box-shadow:0 16px 40px #0005;animation:guidePop .4s ease}
+.guideCard{background:var(--card);border-radius:28px;padding:24px 20px;max-width:340px;width:100%;text-align:center;box-shadow:0 16px 40px #0005;animation:guidePop .4s ease}
 @keyframes guidePop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
 .guideMascot svg{width:88px;height:88px}
 .guidePicto{font-size:44px;margin:6px 0}
@@ -373,6 +389,30 @@ img{max-width:100%}
 .guideSkip{display:block;margin:10px auto 0;background:none;border:0;color:#9aa4b4;font-weight:800;font-size:14px}
 .modeToggle{position:fixed;left:14px;bottom:calc(70px + env(safe-area-inset-bottom));background:#fff;border:3px solid #fff;color:var(--ink);padding:8px 14px;border-radius:99px;z-index:20;font-weight:800;font-size:13px;box-shadow:0 4px 0 #cfae7f}
 .modeToggle:active{transform:translateY(3px);box-shadow:0 1px 0 #cfae7f}
+/* ===== tarjeta de meta (objetivo) ===== */
+.metaCard{margin-top:12px;background:linear-gradient(150deg,#2fb87a,#1a8a5a);border-radius:20px;padding:14px 16px;box-shadow:0 6px 0 #0d5a3a;color:#fff}
+.metaTop{font-family:'Baloo 2';font-weight:800;font-size:16px;margin-bottom:8px}
+.metaBarWrap{height:14px;background:#00000030;border-radius:99px;overflow:hidden;border:2px solid #ffffff33}
+.metaBar{height:100%;background:linear-gradient(90deg,#ffd23f,#ffe98a);border-radius:99px;box-shadow:0 0 10px #ffd23faa;transition:width .5s}
+.metaReward{font-size:13px;font-weight:800;margin-top:8px;opacity:.95}
+/* ===== celebración subir de nivel ===== */
+.levelUp{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:radial-gradient(circle,#1a1147ee,#0f0a2eff);text-align:center;padding:24px}
+.levelUp.show{display:flex;animation:luFade .4s ease}
+@keyframes luFade{from{opacity:0}to{opacity:1}}
+.luCard{animation:luPop .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes luPop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+.luBadge{font-size:100px;animation:luSpin 2s ease-in-out infinite}
+@keyframes luSpin{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(8deg) scale(1.1)}}
+.luTitle{font-family:'Baloo 2';font-weight:800;font-size:34px;color:#ffd23f;margin:10px 0 4px;text-shadow:0 3px 0 #b0851a}
+.luRank{font-family:'Baloo 2';font-weight:800;font-size:20px;color:#fff;margin-bottom:6px}
+.luSub{color:#cdd6f5;font-weight:800;font-size:15px;margin-bottom:20px}
+.luBtn{background:#ffd23f;color:#5a3a00;border:0;font-family:'Baloo 2';font-weight:800;font-size:20px;padding:16px 40px;border-radius:18px;box-shadow:0 6px 0 #b0851a}
+.luBtn:active{transform:translateY(4px);box-shadow:0 2px 0 #b0851a}
+/* ===== desbloqueo de recompensa ===== */
+.unlockCard{background:var(--card);border-radius:26px;padding:28px 22px;max-width:320px;text-align:center;box-shadow:0 16px 40px #0006;animation:luPop .6s cubic-bezier(.2,1.4,.4,1)}
+.unlockEmoji{font-size:80px;animation:luSpin 2s ease-in-out infinite}
+.unlockTitle{font-family:'Baloo 2';font-weight:800;font-size:24px;color:var(--ink);margin:8px 0 2px}
+.unlockName{font-family:'Baloo 2';font-weight:800;font-size:18px;color:#e0762a;margin-bottom:16px}
 </style></head><body>
 <div class="app" id="app">
  <div class="clouds" id="clouds"></div>
@@ -403,6 +443,12 @@ img{max-width:100%}
    <div class="ccText"><div class="ccTitle">Arcade de juegos</div><div class="ccDesc">7 juegos · ¡elige el tuyo! 🎮</div></div>
    <div class="ccArrow">▶</div>
   </button>
+
+  <div class="metaCard" id="metaCard" style="display:none">
+   <div class="metaTop">🎯 <span id="metaTxt"></span></div>
+   <div class="metaBarWrap"><div class="metaBar" id="metaBar"></div></div>
+   <div class="metaReward" id="metaReward"></div>
+  </div>
 
   <div class="secTitle">🗺️ Tus mundos</div>
   <div class="worlds" id="worlds"></div>
@@ -575,7 +621,7 @@ img{max-width:100%}
     <button class="opFace" data-v="aburrido" title="Aburrido">😴</button>
    </div>
    <div class="opThanks" id="opThanks"></div>
-   <button class="bigBtn mt16" id="opSkip" style="max-width:300px;margin:10px auto 0;background:#eef1f6;color:#6a7488;box-shadow:0 5px 0 #cfd6e0">Saltar</button>
+   <button class="bigBtn mt16" id="opSkip" style="max-width:300px;margin:10px auto 0;background:#eef1f6;color:var(--inkSoft);box-shadow:0 5px 0 #cfd6e0">Saltar</button>
   </div>
  </section>
 
@@ -603,6 +649,7 @@ img{max-width:100%}
 <script src="./fx.js"></script>
 <script src="./iconos.js"></script>
 <script src="./dificultad.js"></script>
+<script src="./progreso.js"></script>
 <script src="./minijuego.js"></script>
 <script src="./laberinto.js"></script>
 <script src="./carreras.js"></script>
@@ -614,4 +661,23 @@ img{max-width:100%}
 <script src="./guia.js"></script>
 <script src="./arcade.js"></script>
 <script src="./app.js"></script>
+<div class="levelUp" id="levelUp">
+ <div class="luCard">
+  <div class="luBadge" id="luBadge">⭐</div>
+  <div class="luTitle">¡SUBISTE DE NIVEL!</div>
+  <div class="luRank" id="luRank"></div>
+  <div class="luSub" id="luSub"></div>
+  <button class="luBtn" onclick="cerrarLevelUp()">¡GENIAL! 🎉</button>
+ </div>
+</div>
+
+<div class="levelUp" id="unlockScreen">
+ <div class="unlockCard">
+  <div class="unlockEmoji" id="unlockEmoji">🎁</div>
+  <div class="unlockTitle">¡DESBLOQUEASTE ALGO!</div>
+  <div class="unlockName" id="unlockName"></div>
+  <button class="luBtn" onclick="cerrarUnlock()" style="font-size:18px;padding:14px 32px">¡Genial! ✨</button>
+ </div>
+</div>
+
 </body></html>

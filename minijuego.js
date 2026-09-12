@@ -58,17 +58,18 @@
   function spawn(){
     if(!running) return;
     const set = BUENOS[mundoActualId()] || BUENOS.oceano;
-    const emoji = set[Math.floor(Math.random()*set.length)];
+    const esBonus = Math.random() < 0.10;   // ~1 de cada 10: diamante dorado +3
+    const emoji = esBonus ? '💎' : set[Math.floor(Math.random()*set.length)];
     const el=document.createElement('div');
-    el.className='falling';
+    el.className='falling'+(esBonus?' bonus':'');
     el.textContent=emoji;
     const w=area.clientWidth;
     const x=Math.max(6, Math.random()*(w-56));
     el.style.left=x+'px';
     el.style.top='-60px';
     el._y=-60;
-    el._vy=VELB + Math.random()*1.5;
-    el._x=x;
+    el._vy=(esBonus?VELB*1.4:VELB) + Math.random()*1.5;   // el bonus cae más rápido
+    el._x=x; el._bonus=esBonus;
     el.addEventListener('touchstart', (ev)=>{ ev.preventDefault(); atrapar(el); }, {passive:false});
     el.addEventListener('click', ()=>atrapar(el));
     area.appendChild(el);
@@ -78,11 +79,14 @@
   function atrapar(el){
     if(!running || el._done) return;
     el._done=true;
-    atrapados++;
+    atrapados += el._bonus?3:1;
     document.getElementById('catchN').textContent=atrapados;
     document.getElementById('catchBar').style.width=Math.min(100,(atrapados/META)*100)+'%';
-    if(window.SFX) SFX.tap();
-    if(window.FX){ const c=FX.centro(el); FX.burst(c.x,c.y,{n:12}); FX.sparkle(c.x,c.y); FX.popText(c.x,c.y,'+1','#3ac0c0'); }
+    if(window.SFX){ el._bonus?SFX.premio():SFX.tap(); }
+    if(window.FX){ const c=FX.centro(el);
+      if(el._bonus){ FX.burst(c.x,c.y,{n:24,spread:120,color:'#ffd23f'}); FX.popText(c.x,c.y,'¡+3! 💎','#ffd23f'); }
+      else { FX.burst(c.x,c.y,{n:12}); FX.sparkle(c.x,c.y); FX.popText(c.x,c.y,'+1','#3ac0c0'); }
+    }
     el.classList.add('pop');
     setTimeout(()=>{ el.remove(); caidos=caidos.filter(c=>c!==el); },260);
     if(atrapados>=META) ganar();

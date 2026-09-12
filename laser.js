@@ -44,17 +44,18 @@
   function spawn(){
     if(!running) return;
     const esMalo = Math.random() < PROBMALO;
+    const esBonus = !esMalo && Math.random() < 0.12;   // ~1 de cada 8: estrella dorada x3
     const set = tema.laser.blancos;
-    const emoji = esMalo ? tema.laser.evitar : set[Math.floor(Math.random()*set.length)];
+    const emoji = esMalo ? tema.laser.evitar : (esBonus ? '🌟' : set[Math.floor(Math.random()*set.length)]);
     const el=document.createElement('div');
-    el.className='laserTarget'+(esMalo?' bad':'');
+    el.className='laserTarget'+(esMalo?' bad':'')+(esBonus?' bonus':'');
     el.innerHTML='<span class="ring"></span><span class="em">'+emoji+'</span>';
     const w=area.clientWidth, h=area.clientHeight;
     const x=Math.max(8, Math.random()*(w-72));
     const y=Math.max(8, Math.random()*(h-72));
     el.style.left=x+'px'; el.style.top=y+'px';
-    el._malo=esMalo; el._done=false;
-    const vida=VIDA + Math.random()*300;
+    el._malo=esMalo; el._bonus=esBonus; el._done=false;
+    const vida=(esBonus?VIDA*0.7:VIDA) + Math.random()*300;   // el bonus dura menos: más reto
     el.addEventListener('touchstart',(ev)=>{ev.preventDefault(); pegar(el);},{passive:false});
     el.addEventListener('click',()=>pegar(el));
     area.appendChild(el);
@@ -72,6 +73,12 @@
       if(window.SFX) SFX.animo();
       if(window.FX && c){ FX.shake(document.getElementById('laserArea'),10); FX.burst(c.x,c.y,{color:'#ff5a5f',n:10}); }
       document.getElementById('laserHint').textContent='¡Ese no! 😅 Sigue';
+    }else if(el._bonus){
+      el.classList.add('hit');
+      aciertos+=3;                       // ¡vale 3!
+      if(window.SFX){ SFX.premio(); }
+      if(window.FX && c){ FX.burst(c.x,c.y,{n:26,spread:120,color:'#ffd23f'}); FX.sparkle(c.x,c.y); FX.popText(c.x,c.y,'¡+3! 🌟','#ffd23f'); FX.shake(document.getElementById('laserArea'),6); }
+      document.getElementById('laserHint').textContent='🌟 ¡Estrella dorada! +3';
     }else{
       el.classList.add('hit');
       aciertos++;

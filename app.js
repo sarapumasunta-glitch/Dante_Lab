@@ -3,9 +3,36 @@
    ============================================================ */
 
 /* ---------- estado (guardado en el propio celular) ---------- */
-const SAVE_KEY = 'danteLab_save_v1';
+const PERFILES_KEY = 'danteLab_perfiles';
+const PERFIL_ACTUAL_KEY = 'danteLab_perfilActual';
+let SAVE_KEY = 'danteLab_save_v1';   // se ajusta al perfil activo
 let S = cargarJuego();
 window.S = S;
+
+/* ---------- perfiles (varios niños en un mismo dispositivo) ---------- */
+function listaPerfiles(){
+  try{ return JSON.parse(localStorage.getItem(PERFILES_KEY)||'[]'); }catch(e){ return []; }
+}
+function guardarListaPerfiles(arr){
+  try{ localStorage.setItem(PERFILES_KEY, JSON.stringify(arr)); }catch(e){}
+}
+function perfilActual(){
+  try{ return localStorage.getItem(PERFIL_ACTUAL_KEY)||''; }catch(e){ return ''; }
+}
+function setPerfilActual(id){
+  try{ localStorage.setItem(PERFIL_ACTUAL_KEY, id); }catch(e){}
+  SAVE_KEY = 'danteLab_save_v1_'+id;
+  S = cargarJuego(); window.S = S;
+}
+function crearPerfil(nombre, avatar){
+  const id = 'p'+Date.now();
+  const arr = listaPerfiles();
+  arr.push({ id, nombre, avatar });
+  guardarListaPerfiles(arr);
+  setPerfilActual(id);
+  S.nombre = nombre; guardarJuego();
+  return id;
+}
 
 function estadoInicial(){
   return { nombre:'', poder:'', modo:'aventura', nivel:1, xp:0, gemas:0, estrellas:0, coleccion:{}, retoDiaFecha:'' };
@@ -163,7 +190,9 @@ function render(){
   });
 
   // mascota en HUD + escenario + gate
-  document.getElementById('chip').innerHTML = danteSVG();
+  const pa=perfilActual(); const pf=listaPerfiles().find(p=>p.id===pa);
+  if(pf && pf.avatar){ document.getElementById('chip').innerHTML='<span style="font-size:32px">'+pf.avatar+'</span>'; }
+  else { document.getElementById('chip').innerHTML = danteSVG(); }
   document.getElementById('mascot').innerHTML = danteSVG();
   const gm=document.getElementById('gateMascot'); if(gm) gm.innerHTML = danteSVG();
   if(S.nombre){ const gh=document.getElementById('gateHi'); if(gh) gh.textContent = '¡Hola, '+S.nombre+'! 👋'; }
@@ -277,6 +306,8 @@ function elegirJuego(d){
   if(typeof abrirLaser==='function')     juegos.push({id:'laser',fn:abrirLaser});
   if(typeof abrirRayuela==='function')   juegos.push({id:'rayuela',fn:abrirRayuela});
   if(typeof abrirMiniJuego==='function') juegos.push({id:'atrapa',fn:abrirMiniJuego});
+  if(typeof abrirPenales==='function')   juegos.push({id:'penales',fn:abrirPenales});
+  if(typeof abrirTablero==='function')   juegos.push({id:'tablero',fn:abrirTablero});
   if(juegos.length===0) return abrirReto();
   const j=juegos[s % juegos.length];
   if(typeof mostrarGuia==='function') return mostrarGuia(j.id, j.fn);
@@ -447,17 +478,84 @@ function toast(t){ const x=document.getElementById('toast'); x.textContent=t; x.
   });
 })();
 
-/* ---------- primer arranque: pedir nombre si no hay ---------- */
+/* ---------- primer arranque: perfiles ---------- */
 function arranque(){
-  render();
-  if(!S.nombre){
-    // insertar tarjeta de nombre en el gate en vez del saludo genérico
-    const gc=document.querySelector('#gate .gc');
-    gc.querySelector('h1').textContent='¡Bienvenido, explorador!';
-    // reemplazar textos + botón por pedir nombre
-    gc.querySelector('.enter').textContent='ESCRIBIR MI NOMBRE ✍️';
-    gc.querySelector('.enter').onclick=pedirNombre;
+  // cargar el perfil activo si existe
+  const pa = perfilActual();
+  const perfiles = listaPerfiles();
+  if(pa && perfiles.find(p=>p.id===pa)){
+    SAVE_KEY='danteLab_save_v1_'+pa; S=cargarJuego(); window.S=S;
   }
+  render();
+  // MIGRACIÓN: si hay un save viejo sin perfiles, convertirlo en el primer perfil
+  if(perfiles.length===0){
+    try{
+      const viejo = localStorage.getItem('danteLab_save_v1');
+      if(viejo){ const v=JSON.parse(viejo); if(v && v.nombre){
+        const id=crearPerfil(v.nombre, '🚀'); SAVE_KEY='danteLab_save_v1_'+id;
+        S=Object.assign(estadoInicial(), v); guardarJuego(); window.S=S; render();
+        return; // ya tiene perfil, entra normal
+      }}
+    }catch(e){}
+  }
+  // si no hay ningún perfil, o no hay activo -> pantalla de perfiles
+  if(listaPerfiles().length===0 || !perfilActual()){
+    mostrarPerfiles();
+  }
+}
+
+/* ---------- pantalla de perfiles ---------- */
+const AVATARES = ['🚀','🐠','🦊','🐼','🦁','🐲','🦉','🐙','🦄','🐯'];
+function mostrarPerfiles(){
+  const gc=document.querySelector('#gate .gc');
+  const perfiles=listaPerfiles();
+  let cards = perfiles.map(p=>
+    `<button class="perfilCard" onclick="entrarPerfil('${p.id}')"><div class="paAv">${p.avatar||'🚀'}</div><div class="paName">${p.nombre}</div></button>`
+  ).join('');
+  const puedeCrear = perfiles.length<4;
+  gc.innerHTML=`
+    <div class="badge">✨ DANTE LAB</div>
+    <h1 style="font-family:Baloo 2;font-weight:800;font-size:26px;color:var(--ink);margin:12px 0 4px;text-shadow:0 0 16px #a855f766">${perfiles.length? '¿Quién va a jugar?' : '¡Hola, explorador!'}</h1>
+    <p style="font-weight:800;color:var(--inkSoft);margin-bottom:16px">${perfiles.length? 'Toca tu nombre para seguir tu aventura' : 'Vamos a crear tu explorador'}</p>
+    <div class="perfilGrid">${cards}${puedeCrear? '<button class="perfilCard nuevo" onclick="nuevoPerfil()"><div class="paAv">➕</div><div class="paName">Nuevo</div></button>':''}</div>`;
+}
+function entrarPerfil(id){
+  if(window.SFX) SFX.swoosh();
+  setPerfilActual(id);
+  render(); openGate();
+}
+function nuevoPerfil(){
+  if(window.SFX) SFX.tap();
+  const gc=document.querySelector('#gate .gc');
+  gc.innerHTML=`
+    <div class="badge">✨ Nuevo explorador</div>
+    <h1 style="font-family:Baloo 2;font-weight:800;font-size:24px;color:var(--ink);margin:12px 0 8px">Elige tu avatar</h1>
+    <div class="avatarGrid" id="avatarGrid">${AVATARES.map((a,i)=>`<button class="avOpt${i===0?' sel':''}" data-av="${a}">${a}</button>`).join('')}</div>
+    <div class="nameCard" style="margin-top:16px">
+      <input id="nameInput" placeholder="Tu nombre" maxlength="18" autocomplete="off">
+      <button class="bigBtn" id="nameGo" style="margin-top:14px;opacity:.5;pointer-events:none">🚀 ¡EMPEZAR!</button>
+    </div>`;
+  let avSel=AVATARES[0];
+  document.querySelectorAll('#avatarGrid .avOpt').forEach(b=>{
+    b.onclick=()=>{ avSel=b.dataset.av; document.querySelectorAll('#avatarGrid .avOpt').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); if(window.SFX)SFX.tap(); };
+  });
+  const inp=document.getElementById('nameInput'), go=document.getElementById('nameGo');
+  inp.focus();
+  inp.oninput=()=>{ const ok=inp.value.trim().length>=2; go.style.opacity=ok?'1':'.5'; go.style.pointerEvents=ok?'auto':'none'; };
+  go.onclick=()=>{ const v=inp.value.trim(); if(v.length<2)return;
+    crearPerfil(v, avSel); if(window.SFX)SFX.premio();
+    render(); pedirPoderNuevo();
+  };
+}
+// para un perfil nuevo, tras crear -> pedir poder y modo
+function pedirPoderNuevo(){ pedirPoder(); }
+
+/* ---------- cambiar de jugador (reabrir perfiles) ---------- */
+function cambiarPerfil(){
+  if(window.SFX) SFX.tap();
+  const g=document.getElementById('gate');
+  g.style.display='flex'; g.classList.remove('hide');
+  mostrarPerfiles();
 }
 function pedirNombre(){
   const gc=document.querySelector('#gate .gc');

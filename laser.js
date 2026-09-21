@@ -7,6 +7,7 @@
    ============================================================ */
 (function(){
   let META = 12, TIEMPO = 15, VIDA=800, SPAWN=650, PROBMALO=0.22;
+  let multi=1, eventoActivo=null, SPAWN_boost=1, eventoTimer=null;
   let area, tema=null, aciertos=0, restante=TIEMPO, running=false, spawnT=null, timer=null;
 
   function tema_(){
@@ -31,14 +32,35 @@
     document.getElementById('laserHint').textContent='¡Toca los blancos! Evita el '+tema.laser.evitar;
     document.getElementById('laserBack').onclick=()=>{ detener(); show('v-disc'); };
     show('v-laser');
+    multi=1; eventoActivo=null;
     if(TIEMPO<999) timer=setInterval(()=>{ restante--; document.getElementById('laserT').textContent=Math.max(0,restante); if(restante<=0) fin(); },1000);
     programar();
+    // evento sorpresa aleatorio a mitad de partida (solo en modo aventura con tiempo)
+    if(TIEMPO<999 && window.EVENTOS){
+      const cuando = 3000 + Math.random()*4000;
+      eventoTimer=setTimeout(()=>{ dispararEvento(); }, cuando);
+    }
   };
+
+  function dispararEvento(){
+    if(!running || !window.EVENTOS) return;
+    const ev=EVENTOS.tirar(0.7);   // alta prob: queremos que pase
+    if(!ev) return;
+    EVENTOS.anunciar(ev); eventoActivo=ev.id;
+    const DUR=4000;
+    if(ev.id==='lluvia'){ SPAWN_boost=0.4; }        // muchos más blancos
+    else if(ev.id==='turbo'){ SPAWN_boost=0.45; }
+    else if(ev.id==='lento'){ SPAWN_boost=1.8; }    // más lento, relajado
+    else if(ev.id==='doble'){ multi=2; }            // puntos dobles
+    else if(ev.id==='frenesi'){ SPAWN_boost=0.35; multi=2; }
+    setTimeout(()=>{ SPAWN_boost=1; multi=1; eventoActivo=null;
+      if(running) document.getElementById('laserHint').textContent='¡Sigue así! 💪'; }, DUR);
+  }
 
   function programar(){
     if(!running) return;
     spawn();
-    spawnT=setTimeout(programar, SPAWN + Math.random()*250);
+    spawnT=setTimeout(programar, (SPAWN*SPAWN_boost) + Math.random()*250);
   }
 
   function spawn(){
@@ -75,13 +97,13 @@
       document.getElementById('laserHint').textContent='¡Ese no! 😅 Sigue';
     }else if(el._bonus){
       el.classList.add('hit');
-      aciertos+=3;                       // ¡vale 3!
+      aciertos+=3*multi;
       if(window.SFX){ SFX.premio(); }
       if(window.FX && c){ FX.burst(c.x,c.y,{n:26,spread:120,color:'#ffd23f'}); FX.sparkle(c.x,c.y); FX.popText(c.x,c.y,'¡+3! 🌟','#ffd23f'); FX.shake(document.getElementById('laserArea'),6); }
       document.getElementById('laserHint').textContent='🌟 ¡Estrella dorada! +3';
     }else{
       el.classList.add('hit');
-      aciertos++;
+      aciertos+=1*multi;
       if(window.SFX) SFX.tap();
       if(window.FX && c){ FX.burst(c.x,c.y,{n:12}); FX.sparkle(c.x,c.y); FX.popText(c.x,c.y,'+1','#ffd23f'); }
     }
@@ -91,7 +113,7 @@
     if(aciertos>=META) ganar();
   }
 
-  function detener(){ running=false; clearTimeout(spawnT); clearInterval(timer); }
+  function detener(){ running=false; clearTimeout(spawnT); clearInterval(timer); clearTimeout(eventoTimer); }
   function ganar(){
     if(!running) return; detener();
     if(window.DIF) DIF.subir('laser');

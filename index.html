@@ -413,6 +413,33 @@ img{max-width:100%}
 .unlockEmoji{font-size:80px;animation:luSpin 2s ease-in-out infinite}
 .unlockTitle{font-family:'Baloo 2';font-weight:800;font-size:24px;color:var(--ink);margin:8px 0 2px}
 .unlockName{font-family:'Baloo 2';font-weight:800;font-size:18px;color:#e0762a;margin-bottom:16px}
+/* ===== perfiles ===== */
+.perfilGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.perfilCard{background:var(--card);border:2px solid var(--cardEdge);border-radius:20px;padding:20px 10px;box-shadow:0 6px 18px #0004;display:flex;flex-direction:column;align-items:center;gap:6px}
+.perfilCard:active{transform:translateY(3px)}
+.perfilCard.nuevo{border-style:dashed;border-color:#ffffff44;background:#ffffff08}
+.perfilCard .paAv{font-size:48px}
+.perfilCard .paName{font-family:'Baloo 2';font-weight:800;font-size:16px;color:var(--ink)}
+.avatarGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:8px 0}
+.avOpt{aspect-ratio:1;border-radius:14px;background:var(--card);border:2px solid var(--cardEdge);font-size:28px;display:grid;place-items:center}
+.avOpt:active{transform:scale(.92)}
+.avOpt.sel{border-color:var(--sun);background:#3d3470;box-shadow:0 0 16px #ffd23f66;transform:scale(1.08)}
+/* ===== Penales ===== */
+.penArea{position:relative;width:100%;height:56vh;max-height:460px;border-radius:24px;overflow:hidden;border:2px solid #ffffff22;box-shadow:0 8px 24px #0006}
+.penPorteria{position:absolute;left:5%;right:5%;top:12%;height:42%;display:flex;gap:6px;border:5px solid #ffffffcc;border-radius:10px;background:#ffffff0f;padding:5px}
+.penZona{flex:1;border-radius:6px;background:#ffffff10;transition:background .15s}
+.penZona:active{background:#ffffff35}
+.penGuante{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:48px;transition:left .18s;z-index:3;filter:drop-shadow(0 3px 4px #0006)}
+.penBall{position:absolute;font-size:40px;z-index:2;filter:drop-shadow(0 3px 5px #0007)}
+/* ===== Tablero de aventura ===== */
+.tabCasillas{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:360px;margin:8px auto 0}
+.tabCell{aspect-ratio:1;border-radius:14px;background:var(--card);border:2px solid var(--cardEdge);display:grid;place-items:center;font-size:22px;transition:transform .15s}
+.tabCell.aqui{border-color:var(--sun);box-shadow:0 0 16px #ffd23f88;transform:scale(1.12);background:#3d3470;z-index:2}
+.tabCell.meta{border-color:#2fd479;background:#1a3a2e}
+.tabCell .tc{line-height:1}
+.tabDadoWrap{display:flex;justify-content:center;margin-top:18px}
+.tabDado{width:88px;height:88px;border-radius:22px;background:linear-gradient(150deg,#ffd93f,#ffb02e);border:0;font-size:48px;box-shadow:0 8px 0 var(--sunEdge),0 0 26px #ffd23f66;display:grid;place-items:center}
+.tabDado:active{transform:translateY(5px);box-shadow:0 3px 0 var(--sunEdge)}
 </style></head><body>
 <div class="app" id="app">
  <div class="clouds" id="clouds"></div>
@@ -420,7 +447,7 @@ img{max-width:100%}
  <!-- ===== INICIO ===== -->
  <section class="view active" id="v-home">
   <div class="hud">
-   <div class="chip" id="chip"></div>
+   <div class="chip" id="chip" onclick="cambiarPerfil()" title="Cambiar jugador"></div>
    <div class="hudInfo">
     <div class="hudName"><span id="hName">Explorador</span> <span class="lvlPill" id="hLvl">Nivel 1</span></div>
     <div class="xpbar"><div class="xpfill" id="hXp"></div></div>
@@ -440,7 +467,7 @@ img{max-width:100%}
 
   <button class="creatorCard" onclick="abrirArcade()">
    <div class="ccIcon">🕹️</div>
-   <div class="ccText"><div class="ccTitle">Arcade de juegos</div><div class="ccDesc">7 juegos · ¡elige el tuyo! 🎮</div></div>
+   <div class="ccText"><div class="ccTitle">Arcade de juegos</div><div class="ccDesc">9 juegos · ¡elige el tuyo! 🎮</div></div>
    <div class="ccArrow">▶</div>
   </button>
 
@@ -589,6 +616,28 @@ img{max-width:100%}
   <div class="mazeHint" id="buildHint">¿Qué quieres hacer hoy? 🎨</div>
  </section>
 
+ <!-- ===== PENALES ===== -->
+ <section class="view" id="v-pen">
+  <div class="catchHud">
+   <button class="back" id="penBack">‹ Volver</button>
+   <div class="catchScore">🧤 <span id="penN">0</span> / <span id="penGoal">6</span></div>
+  </div>
+  <div class="catchBarWrap"><div class="catchBar" id="penBar"></div></div>
+  <div class="penArea" id="penArea"><div class="penPorteria" id="penPorteria"></div></div>
+  <div class="mazeHint" id="penHint">¡Toca dónde va la pelota para atajar! 🧤</div>
+ </section>
+
+ <!-- ===== TABLERO DE AVENTURA ===== -->
+ <section class="view" id="v-tab">
+  <div class="catchHud">
+   <button class="back" id="tabBack">‹ Volver</button>
+   <div class="catchScore">⭐ <span id="tabStars">0</span></div>
+  </div>
+  <div class="tabCasillas" id="tabCasillas"></div>
+  <div class="tabDadoWrap"><button class="tabDado" id="tabDado">🎲</button></div>
+  <div class="mazeHint" id="tabHint">¡Toca el dado para avanzar! 🎲</div>
+ </section>
+
  <!-- ===== RETO ===== -->
  <section class="view" id="v-quiz">
   <div class="discHead"><button class="back" id="quizBack">‹ Volver</button></div>
@@ -650,6 +699,7 @@ img{max-width:100%}
 <script src="./iconos.js"></script>
 <script src="./dificultad.js"></script>
 <script src="./progreso.js"></script>
+<script src="./eventos.js"></script>
 <script src="./minijuego.js"></script>
 <script src="./laberinto.js"></script>
 <script src="./carreras.js"></script>
@@ -659,6 +709,8 @@ img{max-width:100%}
 <script src="./plantillas.js"></script>
 <script src="./constructor.js"></script>
 <script src="./guia.js"></script>
+<script src="./penales.js"></script>
+<script src="./tablero.js"></script>
 <script src="./arcade.js"></script>
 <script src="./app.js"></script>
 <div class="levelUp" id="levelUp">

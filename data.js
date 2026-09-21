@@ -244,7 +244,17 @@ const TEMAS = {
       { letra:'T', p:'¿Cuál empieza con T?', o:['🐠 Pez','🐢 Tortuga','🦈 Tiburón'], ok:1 },
       { letra:'P', p:'¿Cuál empieza con P?', o:['🐙 Pulpo','🐳 Ballena','⭐ Estrella'], ok:0 },
       { letra:'D', p:'¿Cuál empieza con D?', o:['🐬 Delfín','🦈 Tiburón','🐡 Globo'], ok:0 },
-      { letra:'M', p:'¿Cuál empieza con M?', o:['🐢 Tortuga','🪼 Medusa','🦀 Cangrejo'], ok:1 }
+      { letra:'M', p:'¿Cuál empieza con M?', o:['🐢 Tortuga','🪼 Medusa','🦀 Cangrejo'], ok:1 },
+      { letra:'C', p:'¿Cuál empieza con C?', o:['🦀 Cangrejo','🐙 Pulpo','🐬 Delfín'], ok:0 },
+      { letra:'🏆', p:'¿Cuál es el MÁS grande del mar?', o:['🐋 Ballena','🦐 Camarón','🐠 Pez'], ok:0 },
+      { letra:'💡', p:'¿Cuál tiene 8 brazos?', o:['🐙 Pulpo','🦈 Tiburón','🐢 Tortuga'], ok:0 },
+      { letra:'💡', p:'¿Cuál brilla en la oscuridad?', o:['🪼 Medusa','🦀 Cangrejo','🐡 Globo'], ok:0 },
+      { letra:'A', p:'¿Cuál empieza con A?', o:['🦭 Foca','🐚 Almeja','🐠 Pez'], ok:1 },
+      { letra:'💡', p:'¿Cuál es súper rápido nadando?', o:['🐬 Delfín','🐢 Tortuga','🐌 Caracol'], ok:0 },
+      { letra:'E', p:'¿Cuál empieza con E?', o:['⭐ Estrella','🐙 Pulpo','🦈 Tiburón'], ok:0 },
+      { letra:'💡', p:'¿Cuál tiene caparazón?', o:['🐢 Tortuga','🐋 Ballena','🐙 Pulpo'], ok:0 },
+      { letra:'F', p:'¿Cuál empieza con F?', o:['🐠 Pez','🦭 Foca','🦀 Cangrejo'], ok:1 },
+      { letra:'💡', p:'¿Cuál puede inflarse como globo?', o:['🐡 Pez globo','🐬 Delfín','🦈 Tiburón'], ok:0 }
     ]}
   },
   animales: {
@@ -256,7 +266,17 @@ const TEMAS = {
       { letra:'P', p:'¿Cuál empieza con P?', o:['🐼 Panda','🦊 Zorro','🦥 Perezoso'], ok:0 },
       { letra:'T', p:'¿Cuál empieza con T?', o:['🐯 Tigre','🦁 León','🐵 Mono'], ok:0 },
       { letra:'C', p:'¿Cuál empieza con C?', o:['🦎 Camaleón','🐧 Pingüino','🦜 Tucán'], ok:0 },
-      { letra:'M', p:'¿Cuál empieza con M?', o:['🐵 Mono','🐘 Elefante','🦒 Jirafa'], ok:0 }
+      { letra:'M', p:'¿Cuál empieza con M?', o:['🐵 Mono','🐘 Elefante','🦒 Jirafa'], ok:0 },
+      { letra:'🏆', p:'¿Cuál es el MÁS grande?', o:['🐘 Elefante','🐭 Ratón','🐰 Conejo'], ok:0 },
+      { letra:'💡', p:'¿Cuál cambia de color?', o:['🦎 Camaleón','🦁 León','🐼 Panda'], ok:0 },
+      { letra:'💡', p:'¿Cuál es el más lento?', o:['🦥 Perezoso','🐆 Guepardo','🐎 Caballo'], ok:0 },
+      { letra:'💡', p:'¿Cuál tiene el cuello largo?', o:['🦒 Jirafa','🐘 Elefante','🦁 León'], ok:0 },
+      { letra:'J', p:'¿Cuál empieza con J?', o:['🦒 Jirafa','🐯 Tigre','🐵 Mono'], ok:0 },
+      { letra:'💡', p:'¿Cuál vuela?', o:['🦜 Tucán','🐘 Elefante','🦥 Perezoso'], ok:0 },
+      { letra:'E', p:'¿Cuál empieza con E?', o:['🐘 Elefante','🦁 León','🐼 Panda'], ok:0 },
+      { letra:'💡', p:'¿Cuál come solo bambú?', o:['🐼 Panda','🐯 Tigre','🦊 Zorro'], ok:0 },
+      { letra:'💡', p:'¿Cuál es el rey de la selva?', o:['🦁 León','🐭 Ratón','🐧 Pingüino'], ok:0 },
+      { letra:'Z', p:'¿Cuál empieza con Z?', o:['🦓 Cebra','🦁 León','🐘 Elefante'], ok:0 }
     ]}
   },
   espacio: {
@@ -268,7 +288,17 @@ const TEMAS = {
       { letra:'S', p:'¿Cuál empieza con S?', o:['☀️ Sol','🪐 Saturno','🌙 Luna'], ok:0 },
       { letra:'M', p:'¿Cuál empieza con M?', o:['🔴 Marte','🌙 Luna','⭐ Estrella'], ok:0 },
       { letra:'C', p:'¿Cuál empieza con C?', o:['☄️ Cometa','🪐 Saturno','🌟 Estrella'], ok:0 },
-      { letra:'G', p:'¿Cuál empieza con G?', o:['🌌 Galaxia','🌙 Luna','☀️ Sol'], ok:0 }
+      { letra:'G', p:'¿Cuál empieza con G?', o:['🌌 Galaxia','🌙 Luna','☀️ Sol'], ok:0 },
+      { letra:'🏆', p:'¿Cuál es el MÁS grande?', o:['☀️ Sol','🌙 Luna','⭐ Estrella'], ok:0 },
+      { letra:'💡', p:'¿Cuál tiene anillos?', o:['🪐 Saturno','🌙 Luna','🔴 Marte'], ok:0 },
+      { letra:'💡', p:'¿Cuál es el planeta rojo?', o:['🔴 Marte','🌙 Luna','☀️ Sol'], ok:0 },
+      { letra:'💡', p:'¿Cuál nos da luz de día?', o:['☀️ Sol','🌙 Luna','⭐ Estrella'], ok:0 },
+      { letra:'💡', p:'¿Cuál tiene una cola de luz?', o:['☄️ Cometa','🪐 Saturno','🔴 Marte'], ok:0 },
+      { letra:'E', p:'¿Cuál empieza con E?', o:['⭐ Estrella','🌙 Luna','☀️ Sol'], ok:0 },
+      { letra:'💡', p:'¿Qué vemos de noche brillar?', o:['⭐ Estrellas','☀️ Sol','🌈 Arcoíris'], ok:0 },
+      { letra:'T', p:'¿Cuál empieza con T?', o:['🌍 Tierra','🌙 Luna','⭐ Estrella'], ok:0 },
+      { letra:'💡', p:'¿Dónde vivimos nosotros?', o:['🌍 La Tierra','🔴 Marte','☀️ El Sol'], ok:0 },
+      { letra:'J', p:'¿Cuál empieza con J?', o:['🪐 Júpiter','🌙 Luna','⭐ Estrella'], ok:0 }
     ]}
   },
   lugares: {
@@ -280,7 +310,14 @@ const TEMAS = {
       { letra:'P', p:'¿Cuál empieza con P?', o:['🔺 Pirámide','🗼 Torre','🐉 Muralla'], ok:0 },
       { letra:'M', p:'¿Cuál empieza con M?', o:['🏔️ Machu Picchu','🗼 Torre','🗽 Estatua'], ok:0 },
       { letra:'E', p:'¿Cuál empieza con E?', o:['🗽 Estatua','🔺 Pirámide','🏔️ Montaña'], ok:0 },
-      { letra:'G', p:'¿Cuál empieza con G?', o:['🐉 Gran Muralla','🗼 Torre','🗿 Pirámide'], ok:0 }
+      { letra:'G', p:'¿Cuál empieza con G?', o:['🐉 Gran Muralla','🗼 Torre','🗿 Pirámide'], ok:0 },
+      { letra:'💡', p:'¿Cuál está en Francia?', o:['🗼 Torre Eiffel','🔺 Pirámide','🐉 Muralla'], ok:0 },
+      { letra:'💡', p:'¿Cuál está en Egipto?', o:['🔺 Pirámides','🗼 Torre','🗽 Estatua'], ok:0 },
+      { letra:'💡', p:'¿Cuál es súper larga?', o:['🐉 Gran Muralla','🗼 Torre','🗿 Estatua'], ok:0 },
+      { letra:'💡', p:'¿Cuál está en una montaña?', o:['🏔️ Machu Picchu','🗽 Estatua','🔺 Pirámide'], ok:0 },
+      { letra:'🏆', p:'¿Cuál es la MÁS alta?', o:['🗼 Torre Eiffel','🏠 Casa','🚗 Carro'], ok:0 },
+      { letra:'C', p:'¿Cuál empieza con C?', o:['🏰 Castillo','🗼 Torre','🔺 Pirámide'], ok:0 },
+      { letra:'💡', p:'¿Cuál construyeron los incas?', o:['🏔️ Machu Picchu','🗼 Torre','🗽 Estatua'], ok:0 }
     ]}
   }
 };

@@ -4,6 +4,8 @@
     carrera:  { emoji:'👈👉', txt:'Toca los lados para mover a tu personaje y esquivar. ¡Llega a la meta!' },
     laser:    { emoji:'👆✨', txt:'Toca los blancos que aparecen. ¡Mientras más rápido, mejor!' },
     atrapa:   { emoji:'👆🎁', txt:'Toca las cosas que caen para atraparlas antes de que lleguen abajo.' },
+    penales:  { emoji:'🧤⚽', txt:'Toca la zona a donde va la pelota para atajarla. ¡Sé el mejor arquero!' },
+    tablero:  { emoji:'🎲⭐', txt:'Toca el dado y avanza por las casillas. ¡Gana estrellas y llega a la meta!' },
     laberinto:{ emoji:'👉🏁', txt:'Lleva a Dante hasta el tesoro deslizando el dedo o con las flechas.' },
     rayuela:  { emoji:'🌟👆', txt:'Toca las casillas en orden para llegar al final. ¡Sigue el camino!' },
     parame:   { emoji:'🔤👆', txt:'Toca la palabra que empieza con la letra. ¡Tú puedes!' }

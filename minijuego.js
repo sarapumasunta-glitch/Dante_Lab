@@ -6,6 +6,7 @@
    ============================================================ */
 (function(){
   let META = 8, TIEMPO = 12, VELB=2.2, SPAWNMS=450;
+  let multi=1, SPAWN_boost=1, eventoTimer=null;
   let area, running=false, timer=null, spawnT=null, caidos=[], atrapados=0, restante=TIEMPO, rafId=null, lastTs=0;
 
   // emojis por mundo (tesoros buenos) y algún distractor
@@ -38,7 +39,9 @@
       timer=setInterval(()=>{ restante--; document.getElementById('catchT').textContent=Math.max(0,restante); if(restante<=0) finJuego(); },1000);
     }
     // aparición de tesoros
+    multi=1; SPAWN_boost=1;
     programarSpawn();
+    if(TIEMPO<999 && window.EVENTOS){ eventoTimer=setTimeout(dispararEvento, 3000+Math.random()*4000); }
     // animación de caída
     rafId=requestAnimationFrame(loop);
   };
@@ -51,7 +54,7 @@
   function programarSpawn(){
     if(!running) return;
     spawn();
-    const prox = 480 + Math.random()*420; // cada ~0.5-0.9s
+    const prox = (480*SPAWN_boost) + Math.random()*420;
     spawnT=setTimeout(programarSpawn, prox);
   }
 
@@ -79,7 +82,7 @@
   function atrapar(el){
     if(!running || el._done) return;
     el._done=true;
-    atrapados += el._bonus?3:1;
+    atrapados += (el._bonus?3:1)*multi;
     document.getElementById('catchN').textContent=atrapados;
     document.getElementById('catchBar').style.width=Math.min(100,(atrapados/META)*100)+'%';
     if(window.SFX){ el._bonus?SFX.premio():SFX.tap(); }
@@ -107,7 +110,16 @@
     rafId=requestAnimationFrame(loop);
   }
 
+  function dispararEvento(){
+    if(!running||!window.EVENTOS) return;
+    const ev=EVENTOS.tirar(0.7); if(!ev) return;
+    EVENTOS.anunciar(ev);
+    if(ev.id==='lluvia'||ev.id==='frenesi'){ SPAWN_boost=0.4; } else if(ev.id==='turbo'){ SPAWN_boost=0.45; } else if(ev.id==='lento'){ SPAWN_boost=1.8; }
+    if(ev.id==='doble'||ev.id==='frenesi'){ multi=2; }
+    setTimeout(()=>{ SPAWN_boost=1; multi=1; },4000);
+  }
   function detener(){
+    clearTimeout(eventoTimer);
     running=false;
     clearInterval(timer); clearTimeout(spawnT); cancelAnimationFrame(rafId);
   }

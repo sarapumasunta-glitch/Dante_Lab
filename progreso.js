@@ -23,7 +23,9 @@ const PROGRESO = (function(){
     oceano:   {emoji:'🐠', nombre:'Compañero Pez', tipo:'buddy', id:'pez'},
     animales: {emoji:'🦊', nombre:'Compañero Zorro', tipo:'buddy', id:'zorro'},
     espacio:  {emoji:'🚀', nombre:'Compañero Cohete', tipo:'buddy', id:'cohete'},
-    lugares:  {emoji:'🌈', nombre:'Colores mágicos', tipo:'tema', id:'arcoiris'}
+    paises:   {emoji:'🌈', nombre:'Colores mágicos', tipo:'tema', id:'arcoiris'},
+    tecnologia:{emoji:'🤖', nombre:'Compañero Robot', tipo:'buddy', id:'robot'},
+    dinosaurios:{emoji:'🦖', nombre:'Compañero Dino', tipo:'buddy', id:'dino'}
   };
 
   function rango(nivel){
@@ -62,7 +64,6 @@ const PROGRESO = (function(){
   // ¿cuál es la meta más cercana para mostrar como objetivo?
   function metaActual(){
     for(const m of (window.MUNDOS||[])){
-      if(m.bloqueado) continue;
       const p=progresoMundo(m.id);
       if(!p.completo && p.total>0){
         const rec=RECOMPENSAS[m.id];

@@ -56,6 +56,27 @@ async function urlWikimedia(fileName) {
   }
 }
 
+/* Imagen principal del artículo de Wikipedia (curada, apta para niños) */
+async function urlArticulo(titulo){
+  const k='art:'+titulo; if (_photoCache[k]) return _photoCache[k];
+  const api='https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=800&redirects=1&titles='+encodeURIComponent(titulo);
+  const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),8000);
+  try{
+    const r=await fetch(api,{signal:ctrl.signal}); clearTimeout(t);
+    const j=await r.json(); const pages=j.query.pages; const pg=pages[Object.keys(pages)[0]];
+    const url=(pg && pg.thumbnail && pg.thumbnail.source)||null;
+    if(url) _photoCache[k]=url; return url;
+  }catch(e){ clearTimeout(t); return null; }
+}
+/* Foto de una ficha: archivo exacto de Commons y, si falla, la del artículo */
+async function urlFotoFicha(d){
+  let url=null;
+  if(d.wiki) url=await urlWikimedia(d.wiki);
+  if(!url && d.wikiArticulo) url=await urlArticulo(d.wikiArticulo);
+  return url;
+}
+window.urlFotoFicha=urlFotoFicha;
+
 /*
   Rellena un contenedor con la foto real (o la ilustración de respaldo).
   contenedor: el elemento donde va la imagen
@@ -68,8 +89,8 @@ async function cargarFoto(contenedor, d) {
   contenedor.dataset.tipo = 'ilustracion';
 
   // 2) intentar foto real en segundo plano
-  if (!d.wiki) return;
-  const url = await urlWikimedia(d.wiki);
+  if (!d.wiki && !d.wikiArticulo) return;
+  const url = await urlFotoFicha(d);
   if (!url) return; // sin internet o sin foto: se queda la ilustración
 
   // precargar la imagen antes de mostrarla (para que no aparezca a medias)

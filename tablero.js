@@ -10,7 +10,7 @@
   const CASILLAS = 15;
   let running=false, pos=0, tema=null, ficha='🚀', tirando=false;
 
-  const FICHAS = { oceano:'🐠', animales:'🦁', espacio:'🚀', lugares:'🧭' };
+  const FICHAS = { oceano:'🐠', animales:'🦁', espacio:'🚀', paises:'🧭', tecnologia:'🤖', dinosaurios:'🦖' };
   // tipos de casilla: normal, estrella, sorpresa, salto, meta
   let tablero=[];
 

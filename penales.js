@@ -13,7 +13,9 @@
     oceano:  { pelota:'🐡', guante:'🐙', fondo:['#0d3a66','#2a7ab0'] },
     animales:{ pelota:'⚽', guante:'🦁', fondo:['#1a5a2a','#3aa85a'] },
     espacio: { pelota:'☄️', guante:'🚀', fondo:['#1a0a4a','#4a2a8a'] },
-    lugares: { pelota:'⚽', guante:'🧤', fondo:['#5a4a2a','#8a6a3a'] }
+    paises:  { pelota:'⚽', guante:'🧤', fondo:['#5a4a2a','#8a6a3a'] },
+    tecnologia:{ pelota:'💿', guante:'🤖', fondo:['#0a3a4a','#1a7a8a'] },
+    dinosaurios:{ pelota:'🥚', guante:'🦖', fondo:['#2a3a0a','#5a7a1a'] }
   };
 
   function temaMundo(){ const id=(window.discActual&&window.discActual.mundo&&window.discActual.mundo.id)||'oceano'; return TEMAS_PEN[id]||TEMAS_PEN.oceano; }

@@ -78,6 +78,10 @@ window.danteSVG = danteSVG;
 
 /* ---------- navegación ---------- */
 function show(id){
+  if(window.VOZ) VOZ.parar();
+  if(id!=='v-globo' && window.cerrarGlobo) cerrarGlobo();
+  if(id!=='v-trex' && window.detenerTrex) detenerTrex();
+  if(id!=='v-orden' && window.pararOrdenar) pararOrdenar();
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
@@ -161,17 +165,15 @@ function render(){
   MUNDOS.forEach(m=>{
     const total = m.descubrimientos.length;
     const hechos = m.descubrimientos.filter(d=>S.coleccion[d.id]).length;
-    const bloqueado = m.bloqueadoHasta && S.nivel < m.bloqueadoHasta;
     const b = document.createElement('button');
-    b.className = 'world'+(bloqueado?' locked':'');
+    b.className = 'world';
     b.style.background = `linear-gradient(150deg, ${m.color}, ${sombra(m.color)})`;
     b.style.boxShadow = `0 7px 0 ${sombra(m.color,0.55)}`;
-    b.innerHTML = `${bloqueado?'<span class="lockTag">🔒</span>':''}
-      <div class="we">${(window.ICONOS_MUNDO&&window.ICONOS_MUNDO[m.id])||m.emoji}</div>
+    b.innerHTML = `<div class="we">${(window.ICONOS_MUNDO&&window.ICONOS_MUNDO[m.id])||m.emoji}</div>
       <div class="wn">${m.nombre}</div>
-      <div class="wm">${bloqueado? 'Nivel '+m.bloqueadoHasta+' para abrir' : hechos+' de '+total+' tesoros'}</div>
+      <div class="wm">${hechos+' de '+total+' tesoros'}</div>
       <div class="dots">${m.descubrimientos.map((d,i)=>`<i class="${S.coleccion[d.id]?'on':''}"></i>`).join('')}</div>`;
-    b.onclick = ()=> bloqueado ? toast('🔒 Sube al nivel '+m.bloqueadoHasta+' para abrir este mundo') : abrirMundo(m.id);
+    b.onclick = ()=> abrirMundo(m.id);
     wc.appendChild(b);
   });
 
@@ -208,8 +210,8 @@ function sombra(hex, f=0.75){
 /* ---------- reto del día (rota según la fecha) ---------- */
 function retoDelDia(){
   const hoy = new Date().toISOString().slice(0,10);
-  // descubrimientos disponibles (no bloqueados) y NO coleccionados aún
-  const dispo = MUNDOS.filter(m=>!(m.bloqueadoHasta && S.nivel<m.bloqueadoHasta))
+  // todos los descubrimientos (acceso libre) que NO estén coleccionados aún
+  const dispo = MUNDOS
     .flatMap(m=> m.descubrimientos.map(d=>({mundoId:m.id, d})));
   const pend = dispo.filter(x=>!S.coleccion[x.d.id]);
   const pool = pend.length? pend : dispo;
@@ -251,6 +253,7 @@ function abrirMundo(mundoId){
   head.style.background = `linear-gradient(150deg, ${m.color}, ${sombra(m.color)})`;
   head.style.boxShadow = `0 8px 0 ${sombra(m.color,0.55)}`;
   head.innerHTML = `<div class="big">${(window.ICONOS_MUNDO&&window.ICONOS_MUNDO[m.id])||m.emoji}</div><h1>${m.nombre}</h1><p>${m.intro}</p>`;
+  pintarExtraMundo(m);
   const sc=document.getElementById('spots'); sc.innerHTML='';
   m.descubrimientos.forEach(d=>{
     const got=!!S.coleccion[d.id];
@@ -265,12 +268,36 @@ function abrirMundo(mundoId){
   show('v-world');
 }
 
+/* ---------- extras de algunos mundos: sistema solar y T-Rex ---------- */
+function pintarExtraMundo(m){
+  const ex=document.getElementById('worldExtra'); if(!ex) return;
+  ex.innerHTML=''; ex.style.display='none';
+  const jugar=(fn)=>{ window._desdeArcade=false; window._desdeMundo=true; if(typeof mostrarGuia==='function') mostrarGuia(fn==='abrirOrdenar'?'ordenar':'trex', window[fn]); else window[fn](); };
+  if(m.id==='espacio' && window.bolaPlaneta){
+    const pl=m.descubrimientos.filter(d=>d.orden).sort((a,b)=>a.orden-b.orden);
+    ex.innerHTML=`<div class="ssTitle">☀️ Toca un planeta para descubrirlo</div>
+      <div class="ssRow"><span class="ssSun">☀️</span>${pl.map(d=>`<button class="ssP${S.coleccion[d.id]?' got':''}" data-id="${d.id}">${bolaPlaneta(d)}<span>${d.corto||d.nombre}</span></button>`).join('')}</div>
+      <button class="bigBtn ssGo" id="ssGo">🪐 Juega: Ordena el sistema solar</button>`;
+    ex.querySelectorAll('.ssP').forEach(b=>{ const d=pl.find(x=>x.id===b.dataset.id);
+      b.onclick=()=> S.coleccion[d.id] ? verCarta(m,d) : abrirDescubrimiento(m.id,d.id,'v-world'); });
+    document.getElementById('ssGo').onclick=()=>jugar('abrirOrdenar');
+    ex.style.display='block';
+  }
+  if(m.id==='dinosaurios' && typeof abrirTrex==='function'){
+    ex.innerHTML=`<button class="bigBtn ssGo trexGo" id="trexGo">🦖 Juega: T-Rex comelón</button>`;
+    document.getElementById('trexGo').onclick=()=>jugar('abrirTrex');
+    ex.style.display='block';
+  }
+}
+
 /* ---------- ver una carta ya ganada (no repite el reto) ---------- */
 function verCarta(m,d){
   if(window.SFX) SFX.tap();
   discActual={mundo:m, d}; window.discActual=discActual;
   document.getElementById('discTitle').textContent=d.nombre;
   document.getElementById('discFact').textContent=d.dato;
+  pintarExtra(d);
+  const vb=document.getElementById('vozBtn'); if(vb){ vb.style.display=(window.VOZ&&VOZ.disponible)?'':'none'; vb.onclick=()=>VOZ.leerFicha(d); }
   document.getElementById('discFb').innerHTML=danteSVG();
   document.getElementById('discBack').onclick=()=>abrirMundo(m.id);
   // el botón, en vez de repetir el reto, felicita y vuelve
@@ -281,6 +308,15 @@ function verCarta(m,d){
   show('v-disc');
 }
 
+/* ---------- datos extra de la ficha: capital y momento importante ---------- */
+function pintarExtra(d){
+  const el=document.getElementById('discExtra'); if(!el) return;
+  let h='';
+  if(d.capital) h+=`<div class="xCap">🏙️ Capital: <b>${d.capital}</b></div>`;
+  if(d.historia) h+=`<div class="xHist"><div class="xT">📜 ${d.capital?'Un momento importante':'¿Sabías que…?'}</div><p>${d.historia}</p></div>`;
+  el.innerHTML=h; el.style.display=h?'block':'none';
+}
+
 /* ---------- descubrimiento (con foto real / respaldo) ---------- */
 let discActual=null, discOrigen='v-home';
 function abrirDescubrimiento(mundoId, discId, origen){
@@ -289,8 +325,10 @@ function abrirDescubrimiento(mundoId, discId, origen){
   discActual={mundo:m, d}; discOrigen=origen; window.discActual=discActual;
   document.getElementById('discTitle').textContent=d.nombre;
   document.getElementById('discFact').textContent=d.dato;
+  pintarExtra(d);
+  const vb=document.getElementById('vozBtn'); if(vb){ vb.style.display=(window.VOZ&&VOZ.disponible)?'':'none'; vb.onclick=()=>VOZ.leerFicha(d); }
   document.getElementById('discFb').innerHTML=danteSVG();
-  document.getElementById('discBack').onclick=()=> origen==='v-world'?abrirMundo(mundoId):goHome();
+  document.getElementById('discBack').onclick=()=> origen==='v-world'?abrirMundo(mundoId): origen==='v-globo'?abrirGlobo():goHome();
   document.getElementById('discBtn').onclick=()=> elegirJuego(d);
   show('v-disc');
   cargarFoto(document.getElementById('discPhoto'), d); // foto real o respaldo
@@ -299,6 +337,21 @@ function abrirDescubrimiento(mundoId, discId, origen){
 /* ---------- elige qué juego según el descubrimiento (variedad estable) ---------- */
 function elegirJuego(d){
   let s=0; for(const c of (d.id||'')) s+=c.charCodeAt(0);
+  // juegos con los datos de la ficha (lo que lee es lo que juega)
+  const conDatos=[];
+  if(typeof abrirSopa==='function')          conDatos.push({id:'sopa',fn:abrirSopa});
+  if(typeof abrirRompecabezas==='function')  conDatos.push({id:'rompecabezas',fn:abrirRompecabezas});
+  if(typeof abrirTrivia==='function')        conDatos.push({id:'trivia',fn:abrirTrivia});
+  if(d.orden && typeof abrirOrdenar==='function') conDatos.push({id:'ordenar',fn:abrirOrdenar});
+  if(/^di\d/.test(d.id) && typeof abrirTrex==='function') conDatos.push({id:'trex',fn:abrirTrex});
+  window._desdeMundo=false;
+  if(conDatos.length){
+    let n=0; try{ n=parseInt(localStorage.getItem('danteLab_rotaJuego')||'0',10)||0; localStorage.setItem('danteLab_rotaJuego', String(n+1)); }catch(e){}
+    const j=conDatos[(s+n) % conDatos.length];
+    window._desdeArcade=false;
+    if(typeof mostrarGuia==='function') return mostrarGuia(j.id, j.fn);
+    return j.fn();
+  }
   const juegos=[];
   if(typeof abrirCarrera==='function')   juegos.push({id:'carrera',fn:abrirCarrera});
   if(typeof abrirLaberinto==='function') juegos.push({id:'laberinto',fn:abrirLaberinto});
@@ -331,11 +384,14 @@ function abrirReto(){
   cargarFoto(document.getElementById('quizPhoto'), d);
   const oc=document.getElementById('quizOpts'); oc.innerHTML='';
   const letras=['A','B','C','D'];
-  d.reto.o.forEach((op,i)=>{
+  // barajar opciones para que la correcta no esté siempre en el mismo lugar
+  const orden=d.reto.o.map((op,i)=>({op,i})).sort(()=>Math.random()-0.5);
+  const correctaPos=orden.findIndex(x=>x.i===d.reto.correcta);
+  orden.forEach((x,pos)=>{
     const b=document.createElement('button');
     b.className='opt';
-    b.innerHTML=`<span class="letter">${letras[i]}</span><span>${op}</span>`;
-    b.onclick=()=>responder(b,i,d.reto.correcta);
+    b.innerHTML=`<span class="letter">${letras[pos]}</span><span>${x.op}</span>`;
+    b.onclick=()=>responder(b,pos,correctaPos);
     oc.appendChild(b);
   });
   show('v-quiz');

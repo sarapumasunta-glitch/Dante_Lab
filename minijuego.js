@@ -14,7 +14,9 @@
     oceano:['🐟','🐠','🦀','🐚','⭐','🐡'],
     animales:['🦋','🐛','🍃','🐞','⭐','🌸'],
     espacio:['⭐','🌟','☄️','🪐','✨','🌙'],
-    lugares:['⭐','🗝️','💎','🎫','✨','🧭']
+    paises:['⭐','🗝️','💎','🎫','✨','🧭'],
+    tecnologia:['⚡','💾','🔋','📡','⭐','💡'],
+    dinosaurios:['🥚','🦴','🌿','⭐','🦕','🍃']
   };
 
   function areaEl(){ return document.getElementById('catchArea'); }

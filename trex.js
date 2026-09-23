@@ -53,7 +53,7 @@
     spD.forEach(p=>g.dinos.push({ r:p.r, c:p.c, casa:{...p}, d:[0,1], vuelve:0 }));
   }
 
-  window.abrirTrex = function(){
+  window.abrirTrexClasico = function(){
     // ficha para el reto final: un dinosaurio (si viene del Arcade, uno al azar)
     const D=(window.MUNDOS||[]).find(m=>m.id==='dinosaurios');
     if(D && (window._desdeArcade || !window.discActual || window.discActual.mundo.id!=='dinosaurios')){
@@ -71,7 +71,7 @@
     jugando=true; ult=performance.now(); cancelAnimationFrame(raf); raf=requestAnimationFrame(bucle);
   };
   function detener(){ jugando=false; cancelAnimationFrame(raf); raf=null; }
-  window.detenerTrex=detener;
+  window.detenerTrexClasico=detener;
 
   function medir(){
     const ancho=Math.min(cv.parentElement.clientWidth, 420), dpr=Math.min(window.devicePixelRatio||1,2);
@@ -199,11 +199,10 @@
   // ---------- controles ----------
   function controles(){
     const fijar=k=>{ if(g) g.quiere=DIRS[k].slice(); };
-    document.querySelectorAll('#trexPad [data-d]').forEach(b=>{
-      b.addEventListener('pointerdown',e=>{ e.preventDefault(); fijar(b.dataset.d); });
-    });
+    // la cruceta la maneja trex-phaser.js (reparte a la versión activa)
     let x0=null,y0=null;
     cv.addEventListener('pointerdown',e=>{ x0=e.clientX; y0=e.clientY; });
+    window._trexClasicoPad=fijar;
     cv.addEventListener('pointermove',e=>{
       if(x0===null) return; const dx=e.clientX-x0, dy=e.clientY-y0;
       if(Math.max(Math.abs(dx),Math.abs(dy))<18) return;

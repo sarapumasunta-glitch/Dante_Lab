@@ -7,7 +7,7 @@
 (function(){
   const NOMBRES_JUEGO = { atrapa:'Atrapa el tesoro', laberinto:'Laberinto', carreras:'Carreras', parame:'Párame la mano',
     laser:'Láser', rayuela:'Rayuela', constructor:'Taller de bloques', penales:'Penales', tablero:'Tablero',
-    sopa:'Sopa de letras', rompecabezas:'Rompecabezas', trivia:'Trivia', ordenar:'Sistema solar', trex:'T-Rex comelón' };
+    sopa:'Sopa de letras', rompecabezas:'Rompecabezas', trivia:'Trivia', ordenar:'Sistema solar', trex:'T-Rex (clásico)', trex2:'T-Rex (nuevo)' };
   const OC = { pacifico:'Pacífico', atlantico:'Atlántico', indico:'Índico', artico:'Ártico', austral:'Antártico' };
   const CARAS = { genial:'😍', bien:'🙂', normal:'😐', aburrido:'😴' };
   let respuesta=0;
@@ -62,6 +62,7 @@
       ${mundos.length? mundos.map(([k,v])=>barra(nombreMundo(k),v,maxM)).join('') : '<p class="pEmpty">Aún no visita mundos.</p>'}
       <div class="pSub">Juegos (terminadas / empezadas)</div>
       ${juegos.length? juegos.map(([k,v])=>barra(NOMBRES_JUEGO[k]||k,v.jugadas,maxJ,v.terminadas+'/'+v.jugadas)).join('') : '<p class="pEmpty">Aún no juega.</p>'}
+      ${p.estrellas&&p.estrellas.trex2?`<div class="pSub">Piloto T-Rex nuevo: estrellas por partida</div><p class="pTxt">⭐ ${p.estrellas.trex2[0]} · ⭐⭐ ${p.estrellas.trex2[1]} · ⭐⭐⭐ ${p.estrellas.trex2[2]}</p>`:''}
       <div class="pSub">Planeta Tierra</div>
       <p class="pTxt">Lo abrió <b>${p.globo.aperturas}</b> veces. Países que tocó: ${paises}. Océanos: ${oceanos}.</p>
       <div class="pSub">Escúchalo</div>
@@ -97,6 +98,7 @@
       t+='Juegos (terminadas/empezadas): '+(Object.entries(p.juegos||{}).map(([k,v])=>(NOMBRES_JUEGO[k]||k)+' '+v.terminadas+'/'+v.jugadas).join(', ')||'—')+'\n';
       t+='Globo: '+p.globo.aperturas+' veces · Países: '+(top(p.globo.paises,5).map(([k,v])=>nombrePais(k)+' '+v).join(', ')||'—')+'\n';
       t+='Voz: '+p.voz+' veces\n';
+      if(p.estrellas&&p.estrellas.trex2) t+='T-Rex nuevo, estrellas (1/2/3): '+p.estrellas.trex2.join('/')+'\n';
     });
     t+='\nOpinión: '+Object.keys(CARAS).map(k=>CARAS[k]+' '+(cuenta[k]||0)).join('  ')+'\n';
     return t;

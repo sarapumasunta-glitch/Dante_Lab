@@ -488,7 +488,10 @@ img{max-width:100%}
 @keyframes wig{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .oTime.poco{background:#ff4d9d;border-color:#ff4d9d;color:#fff}
 /* ===== T-Rex ===== */
+.acBest{display:block;color:#ffd23f;font-size:15px;letter-spacing:2px;margin-top:2px}
 .trexWrap{display:flex;justify-content:center}
+#trexPhaser{width:100%;max-width:420px;aspect-ratio:13/15;border-radius:14px;overflow:hidden;box-shadow:0 0 0 3px #4a6a1a,0 8px 20px #0006}
+#trexPhaser canvas{display:block;touch-action:none}
 #trexCanvas{border-radius:14px;touch-action:none;box-shadow:0 0 0 3px #4a6a1a,0 8px 20px #0006}
 .trexPad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:56px 56px;gap:8px;justify-content:center;margin-top:6px}
 .trexPad button{background:var(--card);border:2px solid var(--cardEdge);border-radius:16px;font-size:22px;color:#fff;touch-action:none}
@@ -818,7 +821,7 @@ img{max-width:100%}
  <section class="view" id="v-trex">
   <div class="catchHud"><button class="back" id="trexBack">‹ Volver</button><div class="catchScore">🦴 <span id="trexFood">0</span> · 🦎 <span id="trexRap">0</span></div></div>
   <div class="catchBarWrap"><div class="catchBar" id="trexBar"></div></div>
-  <div class="trexWrap"><canvas id="trexCanvas" aria-label="Laberinto del T-Rex"></canvas></div>
+  <div class="trexWrap"><div id="trexPhaser" style="display:none"></div><canvas id="trexCanvas" aria-label="Laberinto del T-Rex"></canvas></div>
   <div class="jHint" id="trexHint"></div>
   <div class="trexPad" id="trexPad">
    <button data-d="arriba" aria-label="Arriba">▲</button>
@@ -916,6 +919,8 @@ img{max-width:100%}
 <script src="./juegos-datos.js"></script>
 <script src="./ordenar.js"></script>
 <script src="./trex.js"></script>
+<script src="./trex-sprites.js"></script>
+<script src="./trex-phaser.js"></script>
 <script src="./voz.js"></script>
 <script src="./telemetria.js"></script>
 <script src="./panel.js"></script>

@@ -53,6 +53,7 @@
 
   window.abrirArcade = function(){
     const cont=document.getElementById('arcadeGrid'); cont.innerHTML='';
+    let mejor={}; try{ mejor=JSON.parse(localStorage.getItem('danteLab_mejores')||'{}'); }catch(e){}
     JUEGOS.forEach(j=>{
       const b=document.createElement('button'); b.className='arcadeCard';
       b.style.setProperty('--c', j.color);
@@ -61,7 +62,8 @@
       b.innerHTML=`<span class="acIcon" style="background:${j.color}22">${icono}</span>
         <span class="acName">${j.nombre}</span>
         <span class="acDesc">${j.desc}</span>
-        ${nivel? '<span class="acLvl">⭐ Nivel '+nivel+'</span>':''}`;
+        ${nivel? '<span class="acLvl">⭐ Nivel '+nivel+'</span>':''}
+        ${mejor[j.id]? '<span class="acBest">'+'★'.repeat(mejor[j.id])+'☆'.repeat(3-mejor[j.id])+'</span>':''}`;
       b.onclick=()=>{
         if(window.SFX) SFX.swoosh();
         if(j.id==='constructor'){ if(typeof abrirConstructor==='function') abrirConstructor(); return; }

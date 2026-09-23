@@ -27,7 +27,8 @@
     juego(id){ ultimoJuego=id; sumar(p=>{ p.juegos[id]=p.juegos[id]||{jugadas:0,terminadas:0}; p.juegos[id].jugadas++; }); },
     termino(){ if(!ultimoJuego) return; const id=ultimoJuego; ultimoJuego=null; sumar(p=>{ p.juegos[id]=p.juegos[id]||{jugadas:0,terminadas:0}; p.juegos[id].terminadas++; }); },
     globo(tipo,id){ sumar(p=>{ if(tipo==='abrir') p.globo.aperturas++; else if(tipo==='pais') inc(p.globo.paises,id); else if(tipo==='oceano') inc(p.globo.oceanos,id); }); },
-    voz(){ sumar(p=>p.voz++); }
+    voz(){ sumar(p=>p.voz++); },
+    estrellas(id,n){ sumar(p=>{ p.estrellas=p.estrellas||{}; p.estrellas[id]=p.estrellas[id]||[0,0,0]; p.estrellas[id][n-1]++; }); }
   };
 
   // engancha las funciones existentes sin tocar cada juego
@@ -41,7 +42,7 @@
     envolver('abrirDescubrimiento', (m,d)=>TELEMETRIA.ficha(d));
     const JUEGOS={ abrirMiniJuego:'atrapa', abrirLaberinto:'laberinto', abrirCarrera:'carreras', abrirParame:'parame',
       abrirLaser:'laser', abrirRayuela:'rayuela', abrirConstructor:'constructor', abrirPenales:'penales', abrirTablero:'tablero',
-      abrirSopa:'sopa', abrirRompecabezas:'rompecabezas', abrirTrivia:'trivia', abrirOrdenar:'ordenar', abrirTrex:'trex' };
+      abrirSopa:'sopa', abrirRompecabezas:'rompecabezas', abrirTrivia:'trivia', abrirOrdenar:'ordenar', abrirTrex:'trex2', abrirTrexClasico:'trex' };
     Object.keys(JUEGOS).forEach(fn=>envolver(fn, ()=>TELEMETRIA.juego(JUEGOS[fn])));
     envolver('abrirReto', ()=>TELEMETRIA.termino());
   });

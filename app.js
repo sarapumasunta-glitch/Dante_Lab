@@ -81,6 +81,7 @@ function show(id){
   if(window.VOZ) VOZ.parar();
   if(id!=='v-globo' && window.cerrarGlobo) cerrarGlobo();
   if(id!=='v-trex' && window.detenerTrex) detenerTrex();
+  if(id!=='v-trex' && window.detenerTrexClasico) detenerTrexClasico();
   if(id!=='v-orden' && window.pararOrdenar) pararOrdenar();
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
